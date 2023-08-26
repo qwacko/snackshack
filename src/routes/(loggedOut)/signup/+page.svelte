@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/Button.svelte';
+	import { Button } from 'flowbite-svelte';
 	import LinkButton from '$lib/components/LinkButton.svelte';
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
@@ -14,8 +14,8 @@
 	});
 </script>
 
-<CenterCard title="Create Account" maxWidthRem={30}>
-	<form method="POST" autocomplete="off" use:enhance>
+<CenterCard title="Create Account">
+	<form method="POST" class="flex flex-col space-y-4" autocomplete="off" use:enhance>
 		<TextInput
 			title="Username"
 			errorMessage={$errors.username}
@@ -48,8 +48,8 @@
 		/>
 		<ErrorText message={$message} />
 		<SpreadButtons>
-			<Button type="submit" style="primary">Create</Button>
-			<LinkButton href="/login" style="secondary">Login</LinkButton>
+			<Button type="submit">Sign Up</Button>
+			<Button href="/login">Login</Button>
 		</SpreadButtons>
 	</form>
 </CenterCard>

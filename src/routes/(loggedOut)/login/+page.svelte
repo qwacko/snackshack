@@ -1,9 +1,7 @@
 <script lang="ts">
-	import Button from '$lib/components/Button.svelte';
-	import LinkButton from '$lib/components/LinkButton.svelte';
+	import { Button } from 'flowbite-svelte';
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
-	import SpreadButtons from '$lib/components/SpreadButtons.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { loginSchemaType } from '$lib/schema/loginSchema';
@@ -14,8 +12,8 @@
 	});
 </script>
 
-<CenterCard title="Login" maxWidthRem={30}>
-	<form method="POST" use:enhance>
+<CenterCard title="Login">
+	<form method="POST" class="flex flex-col space-y-4" autocomplete="off" use:enhance>
 		<TextInput
 			title="Username"
 			errorMessage={$errors.username}
@@ -37,11 +35,6 @@
 			{...$constraints.password}
 		/>
 		<ErrorText message={$message} />
-		<SpreadButtons>
-			<Button type="submit" style="primary">Sign In</Button>
-			{#if data.enableSignup}
-				<LinkButton href="/signup" style="secondary">Sign Up</LinkButton>
-			{/if}
-		</SpreadButtons>
+		<Button type="submit" class="w-full">Sign In</Button>
 	</form>
 </CenterCard>
