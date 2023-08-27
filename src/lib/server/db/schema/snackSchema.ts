@@ -1,11 +1,35 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { user } from './userSchema';
+import { relations } from 'drizzle-orm';
+
+export const userOrderConfig = sqliteTable(
+	'user_order_config',
+	{
+		id: text('id').primaryKey(),
+		userId: text('user_id')
+			.unique()
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		amount: integer('amount').notNull().default(0)
+	},
+	(table) => ({
+		userIdx: index('user_order_config_user_idx').on(table.userId)
+	})
+);
+
+export const userOrderConfigRelations = relations(userOrderConfig, ({ one }) => ({
+	user: one(user, { fields: [userOrderConfig.userId], references: [user.id] })
+}));
 
 export const snackGroup = sqliteTable('snack_group', {
 	id: text('id').primaryKey(),
 	title: text('title').unique().notNull(),
 	limit: integer('limit')
 });
+
+export const snackGroupRelations = relations(snackGroup, ({ many }) => ({
+	snacks: many(snack)
+}));
 
 export const snack = sqliteTable(
 	'snack',
@@ -31,11 +55,22 @@ export const snack = sqliteTable(
 	})
 );
 
+export const snackRelations = relations(snack, ({ one, many }) => ({
+	snackGroup: one(snackGroup, { fields: [snack.snackGroupId], references: [snackGroup.id] }),
+	orders: many(orderLine),
+	weekOptions: many(weekOptions)
+}));
+
 export const week = sqliteTable('week', {
 	id: text('id').primaryKey(),
 	startDate: integer('start_date', { mode: 'timestamp' }).notNull(),
 	endDate: integer('end_date', { mode: 'timestamp' }).notNull()
 });
+
+export const weekRelations = relations(week, ({ many }) => ({
+	options: many(weekOptions),
+	orders: many(orderLine)
+}));
 
 export const weekOptions = sqliteTable(
 	'week_options',
@@ -55,6 +90,12 @@ export const weekOptions = sqliteTable(
 		snackIdx: index('option_snack_idx').on(table.snackId)
 	})
 );
+
+export const weekOptionsRelations = relations(weekOptions, ({ one, many }) => ({
+	week: one(week, { fields: [weekOptions.weekId], references: [week.id] }),
+	snack: one(snack, { fields: [weekOptions.snackId], references: [snack.id] }),
+	orders: many(orderLine)
+}));
 
 export const orderLine = sqliteTable(
 	'order_line',
@@ -79,3 +120,9 @@ export const orderLine = sqliteTable(
 		userIdx: index('order_user_idx').on(table.userId)
 	})
 );
+
+export const orderLineRelations = relations(orderLine, ({ one }) => ({
+	user: one(user, { fields: [orderLine.userId], references: [user.id] }),
+	week: one(week, { fields: [orderLine.weekId], references: [week.id] }),
+	snack: one(weekOptions, { fields: [orderLine.snackId], references: [weekOptions.id] })
+}));

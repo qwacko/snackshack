@@ -1,12 +1,24 @@
-import { signupSchema } from '$lib/schema/signupSchema.js';
 import { db } from '$lib/server/db/db.js';
-import { user } from '$lib/server/db/schema';
 import { auth } from '$lib/server/lucia.js';
 import { redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import { message, superValidate } from 'sveltekit-superforms/server';
+import { z } from 'zod';
 
-const passwordSchema = signupSchema.pick({ confirmPassword: true, password: true });
+const passwordSchema = z
+	.object({
+		password: z
+			.string()
+			.min(8)
+			.regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/, {
+				message:
+					'Password must contain at least one uppercase letter, one lowercase letter, and one number.'
+			}),
+		confirmPassword: z.string().min(8)
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: 'Passwords must match',
+		path: ['confirmPassword']
+	});
 
 export type passwordSchemaType = typeof passwordSchema;
 
@@ -35,7 +47,9 @@ export const actions = {
 			return message(form, "You're not allowed to do this");
 		}
 
-		const targetUser = db.select().from(user).where(eq(user.id, targetUserId)).get();
+		const targetUser = await db.query.user.findFirst({
+			where: (userTable, { eq }) => eq(userTable.id, targetUserId)
+		});
 
 		if (!targetUser) {
 			return message(form, 'User Not Found');

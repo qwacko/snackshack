@@ -8,7 +8,9 @@ import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 export const load = async ({ params }) => {
-	const groupInfo = db.select().from(snackGroup).where(eq(snackGroup.id, params.id)).get();
+	const groupInfo = await db.query.snackGroup.findFirst({
+		where: (snackGroupInt, { eq }) => eq(snackGroupInt.id, params.id)
+	});
 
 	if (!groupInfo) {
 		throw redirect(302, '/groups');

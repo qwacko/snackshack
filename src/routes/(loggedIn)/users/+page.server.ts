@@ -1,9 +1,10 @@
 import { db } from '$lib/server/db/db';
-import { user } from '$lib/server/db/schema';
 
 export const load = async () => {
 	// Fetch users from database
-	const users = db.select().from(user).all();
+	const users = await db.query.user.findMany({
+		orderBy: (userTable, { asc }) => [asc(userTable.username)]
+	});
 
 	return { users };
 };
