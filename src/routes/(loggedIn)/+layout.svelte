@@ -13,6 +13,7 @@
 		<MenuIcon class="dots-menu" />
 		<Dropdown triggeredBy=".dots-menu" {activeUrl}>
 			<DropdownItem href="/users" activeClass="font-bold">Users</DropdownItem>
+			<DropdownItem href="/groups" activeClass="font-bold">Snack Groups</DropdownItem>
 			<DropdownItem slot="footer" href="/signout">Sign out</DropdownItem>
 		</Dropdown>
 	</div>

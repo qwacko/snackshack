@@ -6,6 +6,7 @@
 	export let title: string | null;
 	export let name: string;
 	export let required: boolean | undefined | null = undefined;
+	export let value: string | undefined;
 </script>
 
 <Label class="space-y-2">
@@ -20,6 +21,6 @@
 			</div></span
 		>
 	{/if}
-	<Input {...$$restProps} {name} {required} />
+	<Input bind:value {...$$restProps} {name} {required} />
 	<ErrorText message={errorMessage} />
 </Label>

@@ -41,8 +41,6 @@ export const actions = {
 			return message(form, 'User Not Found');
 		}
 
-		console.log('Target User: ', targetUser);
-
 		try {
 			await auth.updateKeyPassword(
 				'username',
