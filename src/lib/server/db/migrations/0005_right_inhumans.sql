@@ -1,1 +1,0 @@
-CREATE INDEX `user_order_config_user_idx` ON `user_order_config` (`user_id`);

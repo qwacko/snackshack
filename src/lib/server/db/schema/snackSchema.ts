@@ -101,9 +101,9 @@ export const orderLine = sqliteTable(
 	'order_line',
 	{
 		id: text('id').primaryKey(),
-		userId: text('user_id')
+		userOrderConfigId: text('user_order_config_id')
 			.notNull()
-			.references(() => user.id, { onDelete: 'cascade' }),
+			.references(() => userOrderConfig.id),
 		weekId: text('week_id')
 			.notNull()
 			.references(() => week.id, { onDelete: 'cascade' }),
@@ -117,12 +117,15 @@ export const orderLine = sqliteTable(
 	(table) => ({
 		weekIdx: index('order_week_idx').on(table.weekId),
 		snackIdx: index('order_snack_idx').on(table.snackId),
-		userIdx: index('order_user_idx').on(table.userId)
+		userIdx: index('order_user_idx').on(table.userOrderConfigId)
 	})
 );
 
 export const orderLineRelations = relations(orderLine, ({ one }) => ({
-	user: one(user, { fields: [orderLine.userId], references: [user.id] }),
+	userOrderConfig: one(userOrderConfig, {
+		fields: [orderLine.userOrderConfigId],
+		references: [userOrderConfig.id]
+	}),
 	week: one(week, { fields: [orderLine.weekId], references: [week.id] }),
 	snack: one(weekOptions, { fields: [orderLine.snackId], references: [weekOptions.id] })
 }));

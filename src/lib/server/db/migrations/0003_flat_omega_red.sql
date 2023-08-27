@@ -1,1 +1,0 @@
-ALTER TABLE week_options ADD `special` integer DEFAULT false NOT NULL;

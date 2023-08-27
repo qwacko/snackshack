@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1692494019563,
-      "tag": "0000_flippant_kingpin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1693100563282,
-      "tag": "0001_outgoing_phil_sheldon",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1693113171190,
-      "tag": "0002_freezing_maginty",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1693122126564,
-      "tag": "0003_flat_omega_red",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1693138374269,
-      "tag": "0004_little_thor_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1693138442172,
-      "tag": "0005_right_inhumans",
+      "when": 1693141312418,
+      "tag": "0000_lovely_kinsey_walden",
       "breakpoints": true
     }
   ]

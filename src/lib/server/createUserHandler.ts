@@ -50,5 +50,5 @@ export const createUserHandler = async ({
 	}
 	// redirect to
 	// make sure you don't throw inside a try/catch block!
-	throw redirect(302, '/user');
+	throw redirect(302, '/');
 };
