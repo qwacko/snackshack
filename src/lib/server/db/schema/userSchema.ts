@@ -5,6 +5,7 @@ import { orderLine, userOrderConfig } from './snackSchema';
 export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
 	username: text('username').notNull().unique(),
+	name: text('name').notNull().default('Name'),
 	admin: integer('admin', { mode: 'boolean' }).notNull().default(false)
 });
 

@@ -30,6 +30,7 @@ export const createUserHandler = async ({
 			},
 			attributes: {
 				username: form.data.username,
+				name: form.data.name,
 				admin: (admin ? 1 : 0) as unknown as boolean
 			}
 		});

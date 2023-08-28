@@ -1,3 +1,4 @@
+import { updateNameSchema } from '$lib/schema/updatePasswordSchema copy.js';
 import { updateUserOrderingConfigSchema } from '$lib/schema/userOrderingConfigSchema.js';
 import { db } from '$lib/server/db/db';
 import { user, userOrderConfig } from '$lib/server/db/schema';
@@ -9,10 +10,12 @@ export const load = async ({ parent }) => {
 	const parentData = await parent();
 	const orderingData = parentData.currentUser.userOrderConfig;
 
-	const form = await superValidate(orderingData, updateUserOrderingConfigSchema);
+	const form = superValidate(orderingData, updateUserOrderingConfigSchema);
+	const usernameForm = superValidate({ name: parentData.currentUser.name }, updateNameSchema);
 
 	return {
-		form
+		form,
+		usernameForm
 	};
 };
 
@@ -134,5 +137,21 @@ export const actions = {
 			.run();
 
 		return { form };
+	},
+	updateName: async ({ params, request, locals }) => {
+		const usernameForm = await superValidate(request, updateNameSchema);
+
+		const authUser = await locals.auth.validate();
+		if (!authUser) {
+			return setMessage(usernameForm, 'You must be logged in to do that');
+		}
+
+		if (!authUser.user.admin) {
+			return setMessage(usernameForm, 'You must be an admin to do that');
+		}
+
+		db.update(user).set({ name: usernameForm.data.name }).where(eq(user.id, params.id)).run();
+
+		return { usernameForm };
 	}
 };

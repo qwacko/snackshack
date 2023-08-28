@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
+	import PageLayout from '$lib/components/PageLayout.svelte';
 	import SpreadButtons from '$lib/components/SpreadButtons.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import type { signupSchemaType } from '$lib/schema/signupSchema.js';
@@ -20,8 +21,18 @@
 	});
 </script>
 
-<CenterCard title="New User">
-	<form method="POST" autocomplete="off" use:enhance>
+<PageLayout title="New User" size="xs">
+	<form method="POST" autocomplete="off" use:enhance class="flex flex-col gap-4">
+		<TextInput
+			title="Name"
+			errorMessage={$errors.name}
+			id="name"
+			name="name"
+			type="text"
+			data-invalid={$errors.name}
+			bind:value={$form.name}
+			{...$constraints.name}
+		/>
 		<TextInput
 			title="Username"
 			errorMessage={$errors.username}
@@ -58,4 +69,4 @@
 			<Button href="/users" outline color="light">Cancel</Button>
 		</SpreadButtons>
 	</form>
-</CenterCard>
+</PageLayout>
