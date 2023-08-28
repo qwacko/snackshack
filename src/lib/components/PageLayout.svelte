@@ -1,6 +1,4 @@
 <script lang="ts">
-	import PageHeading from './PageHeading.svelte';
-
 	export let title: string | undefined = undefined;
 	export let subtitle: string | undefined = undefined;
 	export let size: 'sm' | 'lg' | 'xs' = 'lg';
@@ -14,7 +12,7 @@
 		class:max-w-xs={size === 'xs'}
 	>
 		{#if title}
-			<PageHeading {title}><slot name="heading" /></PageHeading>
+			<h3 class="flex justify-center text-4xl font-bold">{title}</h3>
 		{/if}
 		{#if subtitle}
 			<h5 class="flex justify-center text-xl font-bold">{subtitle}</h5>
