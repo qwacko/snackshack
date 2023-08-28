@@ -14,8 +14,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const [user, noAdmin] = await Promise.all([event.locals.auth.validate(), dbNoAdmins()]);
 
-	logging.info('Route Name', event.route);
-
 	if (event.route.id === '/') {
 		if (noAdmin) {
 			return Response.redirect(`${event.url.origin}/firstUser`, 302);

@@ -19,8 +19,6 @@ export const actions = {
 			return { form };
 		}
 
-		logging.info('form.data', form.data);
-
 		try {
 			await db
 				.insert(snack)

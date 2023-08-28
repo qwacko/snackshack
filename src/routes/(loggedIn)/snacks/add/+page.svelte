@@ -5,6 +5,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { Input, Label, Button, Select } from 'flowbite-svelte';
 	import SelectInput from '$lib/components/SelectInput.svelte';
+	import RangeInput from '$lib/components/RangeInput.svelte';
 
 	export let data;
 
@@ -31,8 +32,6 @@
 			maxQuantity: newLimit
 		};
 	};
-
-	$: console.log('Snack Group Id ', $form.snackGroupId);
 </script>
 
 <div class="flex w-full flex-col items-center">
@@ -72,6 +71,18 @@
 					<Button type="button" on:click={() => updateLimit(1)}>+</Button>
 				</div>
 			</Label>
+			<RangeInput
+				id="salePercentage"
+				title="Sale Percentage - {$form.salePercentage}%"
+				errorMessage={$errors.salePercentage}
+				min="0"
+				max="100"
+				step="5"
+				name="salePercentage"
+				data-invalid={$errors.salePercentage}
+				bind:value={$form.salePercentage}
+				{...$constraints.salePercentage}
+			/>
 			<Button type="submit">Add Snack</Button>
 			<Button href="/snacks" outline>Cancel</Button>
 		</form>

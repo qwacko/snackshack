@@ -18,7 +18,7 @@
 
 			<div class="flex grid-cols-10 gap-2">
 				{#each snacksInGroup as snack}
-					<Card href="/snack/{snack.id}">
+					<Card href="/snacks/{snack.id}">
 						<p>{snack.title}</p>
 					</Card>
 				{/each}
