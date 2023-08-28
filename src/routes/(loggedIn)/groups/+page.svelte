@@ -1,16 +1,14 @@
 <script lang="ts">
+	import PageLayout from '$lib/components/PageLayout.svelte';
 	import { Alert, Badge, Button, Card, Heading } from 'flowbite-svelte';
 
 	export let data;
 </script>
 
-<div class="flex w-full flex-col items-center justify-center gap-2">
-	<div class="mb-2 flex flex-row gap-4">
-		<Heading tag="h3">Groups</Heading>
-		<Button href="/groups/add">Add</Button>
-	</div>
+<PageLayout title="Groups" size="lg">
+	<Button href="/groups/add" outline class="self-center">Add</Button>
 	{#if data.groups.length > 0}
-		<div class="grid grid-cols-1 gap-1 sm:grid-cols-3 md:grid-cols-5">
+		<div class="flex flex-row items-stretch justify-center gap-4">
 			{#each data.groups as group}
 				<Card href="/groups/{group.id}">
 					<div class="flex flex-col items-center justify-center gap-2">
@@ -25,4 +23,4 @@
 	{:else}
 		<Alert class="w-max-48 text-center" color="red">No groups found</Alert>
 	{/if}
-</div>
+</PageLayout>

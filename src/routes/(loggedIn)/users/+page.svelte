@@ -1,5 +1,4 @@
 <script lang="ts">
-	import PageHeading from '$lib/components/PageHeading.svelte';
 	import PageLayout from '$lib/components/PageLayout.svelte';
 	import { Badge, Button, Card } from 'flowbite-svelte';
 

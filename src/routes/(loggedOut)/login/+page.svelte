@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Button } from 'flowbite-svelte';
-	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { loginSchemaType } from '$lib/schema/loginSchema';
+	import PageLayout from '$lib/components/PageLayout.svelte';
 
 	export let data;
 	const { form, errors, constraints, message, enhance } = superForm<loginSchemaType>(data.form, {
@@ -12,7 +12,7 @@
 	});
 </script>
 
-<CenterCard title="Login">
+<PageLayout title="Login" size="xs">
 	<form method="POST" class="flex flex-col space-y-4" autocomplete="off" use:enhance>
 		<TextInput
 			title="Username"
@@ -37,4 +37,4 @@
 		<ErrorText message={$message} />
 		<Button type="submit" class="w-full">Sign In</Button>
 	</form>
-</CenterCard>
+</PageLayout>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import CenterCard from '$lib/components/CenterCard.svelte';
+	import PageLayout from '$lib/components/PageLayout.svelte';
 
 	export let data;
 
@@ -10,7 +11,7 @@
 	$: numberPages = Math.ceil(data.backupFiles.length / perPage);
 </script>
 
-<CenterCard title="Backups">
+<PageLayout title="Backups" size="lg">
 	<div class="column-div">
 		{#each displayFiles as backup}
 			<div class="row-div">
@@ -52,8 +53,8 @@
 				</form>
 			</div>
 		</div>
-	</div></CenterCard
->
+	</div>
+</PageLayout>
 
 <style>
 	.row-div {

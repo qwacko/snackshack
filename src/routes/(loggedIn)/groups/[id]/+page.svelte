@@ -4,6 +4,8 @@
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { Input, Label, Button } from 'flowbite-svelte';
+	import PageLayout from '$lib/components/PageLayout.svelte';
+	import RangeInput from '$lib/components/RangeInput.svelte';
 
 	export let data;
 
@@ -32,40 +34,37 @@
 	};
 </script>
 
-<div class="flex w-full flex-col items-center">
-	<CenterCard title="Update Group {data.groupInfo.title}">
-		<form method="POST" action="?/update" class=" flex w-full flex-col gap-4" use:enhance>
-			<TextInput
-				title="Title"
-				errorMessage={$errors.title}
-				id="title"
-				name="title"
-				type="text"
-				data-invalid={$errors.title}
-				bind:value={$form.title}
-				{...$constraints.title}
-			/>
-			<Label>
-				<span class="my-2">Item Limit</span>
-				<div class="flex flex-row justify-start gap-2 pt-2">
-					<Button type="button" on:click={() => updateLimit(-1)}>-</Button>
-					<Input
-						type="number"
-						id="limit"
-						name="limit"
-						bind:value={$form.limit}
-						{...$constraints.limit}
-					/>
-					<Button type="button" on:click={() => updateLimit(1)}>+</Button>
-				</div>
-			</Label>
-			<div class="flex w-full flex-row justify-between">
-				<Button href="/groups">Cancel</Button>
-				<Button type="submit">Update Group</Button>
-			</div>
-		</form>
-		<form method="POST" action="?/delete" class="mt-2 flex w-full">
-			<Button type="submit" color="red" outline class="w-full">Delete Group</Button>
-		</form>
-	</CenterCard>
-</div>
+<PageLayout title="Update Group" subtitle={data.groupInfo.title} size="xs">
+	<form method="POST" action="?/update" class=" flex w-full flex-col gap-4" use:enhance>
+		<TextInput
+			title="Title"
+			errorMessage={$errors.title}
+			id="title"
+			name="title"
+			type="text"
+			data-invalid={$errors.title}
+			bind:value={$form.title}
+			{...$constraints.title}
+		/>
+		<RangeInput
+			title="Max Quantity - {$form.limit ? $form.limit : 'Any'}"
+			errorMessage={$errors.limit}
+			min="0"
+			max="10"
+			step="1"
+			name="limit"
+			initialValue={0}
+			initialValueText="No Limit"
+			data-invalid={$errors.limit}
+			bind:value={$form.limit}
+			{...$constraints.limit}
+		/>
+		<div class="flex w-full flex-row justify-between gap-4">
+			<Button class="flex flex-grow" type="submit">Update Group</Button>
+			<Button class="flex flex-grow" href="/groups" outline color="light">Cancel</Button>
+		</div>
+	</form>
+	<form method="POST" action="?/delete" class="mt-2 flex w-full">
+		<Button type="submit" color="red" outline class="w-full">Delete Group</Button>
+	</form>
+</PageLayout>

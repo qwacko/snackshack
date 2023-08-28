@@ -5,6 +5,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { signupSchemaType } from '$lib/schema/signupSchema.js';
+	import PageLayout from '$lib/components/PageLayout.svelte';
 
 	export let data;
 	const { form, errors, constraints, message, enhance } = superForm<signupSchemaType>(data.form, {
@@ -12,8 +13,18 @@
 	});
 </script>
 
-<CenterCard title="Create Admin User">
+<PageLayout title="Create First User" size="xs">
 	<form method="POST" class="flex flex-col space-y-4" autocomplete="off" use:enhance>
+		<TextInput
+			title="Name"
+			errorMessage={$errors.name}
+			id="name"
+			name="name"
+			type="text"
+			data-invalid={$errors.name}
+			bind:value={$form.name}
+			{...$constraints.name}
+		/>
 		<TextInput
 			title="Username"
 			errorMessage={$errors.username}
@@ -47,4 +58,4 @@
 		<ErrorText message={$message} />
 		<Button type="submit" class="w-full">Create First Admin User</Button>
 	</form>
-</CenterCard>
+</PageLayout>

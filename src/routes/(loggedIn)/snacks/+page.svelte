@@ -1,18 +1,16 @@
 <script lang="ts">
+	import PageLayout from '$lib/components/PageLayout.svelte';
 	import { Button, Badge, Card, Heading } from 'flowbite-svelte';
 
 	export let data;
 </script>
 
-<div class=" flex w-full flex-col items-center gap-10 p-4">
-	<div class="mb-2 flex flex-row justify-center gap-4">
-		<Heading tag="h3">Snacks</Heading>
-		<Button href="/snacks/add">Add</Button>
-	</div>
+<PageLayout title="Snacks" size="lg">
+	<Button class="self-center" href="/snacks/add">Add</Button>
 	{#each data.snackGroups as group}
 		{@const snacksInGroup = data.snacks.filter((snack) => snack.snackGroupId === group.id)}
 		{@const groupLimit = group.limit ? group.limit : undefined}
-		<div class="flex flex-col items-center gap-2">
+		<div class="flex flex-col items-center gap-2 pt-4">
 			<div class="mb-2 flex flex-row justify-center gap-4">
 				<Heading tag="h4">{group.title}</Heading>
 				{#if groupLimit !== undefined}
@@ -38,4 +36,4 @@
 			</div>
 		</div>
 	{/each}
-</div>
+</PageLayout>
