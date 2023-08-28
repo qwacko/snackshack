@@ -6,32 +6,15 @@
 	import { Input, Label, Button, Select } from 'flowbite-svelte';
 	import SelectInput from '$lib/components/SelectInput.svelte';
 	import RangeInput from '$lib/components/RangeInput.svelte';
+	import NumberInput from '$lib/components/NumberInput.svelte';
+	import CheckboxInput from '$lib/components/CheckboxInput.svelte';
 
 	export let data;
 
 	const { form, errors, constraints, message, enhance, fields } = superForm<AddSnackSchemaType>(
-		data.addForm,
+		data.form,
 		{ taintedMessage: null }
 	);
-
-	const updateLimit = (change: number) => {
-		let newLimit = $form.maxQuantity;
-
-		if (newLimit === undefined || newLimit === null) {
-			newLimit = 0;
-		}
-
-		newLimit += change;
-
-		if (newLimit < 0) {
-			newLimit = 0;
-		}
-
-		$form = {
-			...$form,
-			maxQuantity: newLimit
-		};
-	};
 </script>
 
 <div class="flex w-full flex-col items-center">
@@ -57,20 +40,38 @@
 				items={data.snackGroups.map((group) => ({ value: group.id, name: group.title }))}
 				{...$constraints.snackGroupId}
 			/>
-			<Label>
-				<span class="my-2">Item Limit</span>
-				<div class="flex flex-row justify-start gap-2 pt-2">
-					<Button type="button" on:click={() => updateLimit(-1)}>-</Button>
-					<Input
-						type="number"
-						id="limit"
-						name="limit"
-						bind:value={$form.maxQuantity}
-						{...$constraints.maxQuantity}
-					/>
-					<Button type="button" on:click={() => updateLimit(1)}>+</Button>
-				</div>
-			</Label>
+			<RangeInput
+				id="maxQuantity"
+				title="Max Quantity - {$form.maxQuantity ? $form.maxQuantity : 'Any'}"
+				errorMessage={$errors.maxQuantity}
+				min="0"
+				max="10"
+				step="1"
+				name="maxQuantity"
+				initialValue={1}
+				initialValueText="Enable Limit"
+				data-invalid={$errors.maxQuantity}
+				bind:value={$form.maxQuantity}
+				{...$constraints.maxQuantity}
+			/>
+			<CheckboxInput
+				title="Override Group Quantity Limit"
+				message="Overridden"
+				errorMessage={$errors.overrideGroupLimit}
+				name="overrideGroupLimit"
+				bind:value={$form.overrideGroupLimit}
+				{...$constraints.overrideGroupLimit}
+			/>
+			<NumberInput
+				type="number"
+				id="priceCents"
+				title="Price (cents) - ${$form.priceCents / 100.0}"
+				errorMessage={$errors.priceCents}
+				name="priceCents"
+				data-invalid={$errors.maxQuantity}
+				bind:value={$form.priceCents}
+				{...$constraints.priceCents}
+			/>
 			<RangeInput
 				id="salePercentage"
 				title="Sale Percentage - {$form.salePercentage}%"
@@ -82,6 +83,37 @@
 				data-invalid={$errors.salePercentage}
 				bind:value={$form.salePercentage}
 				{...$constraints.salePercentage}
+			/>
+			<NumberInput
+				type="number"
+				id="salePrice"
+				title="Sale Price (cents) - ${$form.salePrice / 100.0}"
+				errorMessage={$errors.salePrice}
+				name="salePrice"
+				data-invalid={$errors.salePrice}
+				bind:value={$form.salePrice}
+				{...$constraints.salePrice}
+			/>
+			<RangeInput
+				id="availablePercentage"
+				title="Available Percentage - {$form.availablePercentage}%"
+				errorMessage={$errors.availablePercentage}
+				min="0"
+				max="100"
+				step="5"
+				name="availablePercentage"
+				data-invalid={$errors.availablePercentage}
+				bind:value={$form.availablePercentage}
+				{...$constraints.availablePercentage}
+			/>
+
+			<CheckboxInput
+				title="Enabled"
+				message="Enabled"
+				errorMessage={$errors.enabled}
+				name="enabled"
+				bind:value={$form.enabled}
+				{...$constraints.enabled}
 			/>
 			<Button type="submit">Add Snack</Button>
 			<Button href="/snacks" outline>Cancel</Button>

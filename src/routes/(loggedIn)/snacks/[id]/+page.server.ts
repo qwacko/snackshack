@@ -40,5 +40,7 @@ export const actions = {
 			logging.error('Error Updating Snack', e);
 			return setError(form, 'title', 'Update Error');
 		}
+
+		throw redirect(302, '/snacks');
 	}
 };

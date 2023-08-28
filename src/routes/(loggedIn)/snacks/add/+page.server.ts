@@ -8,7 +8,7 @@ import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
 
 export const load = () => ({
-	addForm: superValidate(addSnackSchema)
+	form: superValidate(addSnackSchema)
 });
 
 export const actions = {
