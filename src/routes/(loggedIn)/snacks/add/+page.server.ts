@@ -3,7 +3,7 @@ import { snack } from '$lib/server/db/schema';
 import { setError, superValidate } from 'sveltekit-superforms/server';
 
 import { nanoid } from 'nanoid';
-import { addSnackSchema } from './addSnackSchema';
+import { addSnackSchema } from '$lib/schema/addSnackSchema';
 import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
 

@@ -3,8 +3,9 @@ import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ params }) => {
 	// Fetch users from database
-	const currentUser = db.query.user.findFirst({
-		where: (user, { eq }) => eq(user.id, params.id)
+	const currentUser = await db.query.user.findFirst({
+		where: (user, { eq }) => eq(user.id, params.id),
+		with: { userOrderConfig: true }
 	});
 
 	if (!currentUser) {

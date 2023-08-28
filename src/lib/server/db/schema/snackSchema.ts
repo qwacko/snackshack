@@ -10,7 +10,8 @@ export const userOrderConfig = sqliteTable(
 			.unique()
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
-		amount: integer('amount').notNull().default(0)
+		amount: integer('amount').notNull().default(0),
+		enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true)
 	},
 	(table) => ({
 		userIdx: index('user_order_config_user_idx').on(table.userId)

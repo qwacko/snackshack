@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms/client';
-	import type { UpdateSnackSchemaType } from './updateSnackSchema.js';
+	import type { UpdateSnackSchemaType } from '$lib/schema/updateSnackSchema.js';
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { Input, Label, Button, Select } from 'flowbite-svelte';

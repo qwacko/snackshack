@@ -1,23 +1,25 @@
 <script lang="ts">
-	import Button from '$lib/components/Button.svelte';
 	import { enhance } from '$app/forms';
 	import SpreadButtons from '$lib/components/SpreadButtons.svelte';
 	import { page } from '$app/stores';
-	import LinkButton from '$lib/components/LinkButton.svelte';
+	import PageLayout from '$lib/components/PageLayout.svelte';
+
+	import { Button } from 'flowbite-svelte';
+
+	export let data;
 </script>
 
-<h1>Delete User?</h1>
-<form method="POST" use:enhance>
+<PageLayout title="User" subtitle="Delete User" size="xs">
 	<div>
-		<SpreadButtons>
-			<Button type="submit">Delete User</Button>
-			<LinkButton href="/users/{$page.params.id}" style="secondary">Cancel</LinkButton>
-		</SpreadButtons>
+		Are you sure you want to delete user <b>{data.currentUser.username}</b>? This will also delete
+		all of their orders.
 	</div>
-</form>
-
-<style>
-	div {
-		padding: 10px;
-	}
-</style>
+	<form method="POST" use:enhance>
+		<div>
+			<SpreadButtons>
+				<Button type="submit">Delete {data.currentUser.username}</Button>
+				<Button href="/users/{$page.params.id}" outline color="light">Cancel</Button>
+			</SpreadButtons>
+		</div>
+	</form>
+</PageLayout>

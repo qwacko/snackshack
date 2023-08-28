@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Button } from 'flowbite-svelte';
-	import LinkButton from '$lib/components/LinkButton.svelte';
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
 	import SpreadButtons from '$lib/components/SpreadButtons.svelte';

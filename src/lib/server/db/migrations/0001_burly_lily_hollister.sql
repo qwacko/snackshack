@@ -1,0 +1,1 @@
+ALTER TABLE user_order_config ADD `enabled` integer DEFAULT true NOT NULL;

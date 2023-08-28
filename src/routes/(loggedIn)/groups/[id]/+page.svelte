@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms/client';
-	import type { UpdateGroupSchemaType } from './updateGroupSchema.js';
+	import type { UpdateGroupSchemaType } from '$lib/schema/updateGroupSchema.js';
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { Input, Label, Button } from 'flowbite-svelte';

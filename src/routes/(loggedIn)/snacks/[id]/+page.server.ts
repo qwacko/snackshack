@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/db.js';
 import { redirect } from '@sveltejs/kit';
 import { superValidate, setError } from 'sveltekit-superforms/server';
-import { updateSnackSchema } from './updateSnackSchema.js';
+import { updateSnackSchema } from '$lib/schema/updateSnackSchema.js';
 import { snack } from '$lib/server/db/schema/snackSchema.js';
 import { eq } from 'drizzle-orm';
 import { logging } from '$lib/server/logging.js';

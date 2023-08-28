@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/db';
 import { snackGroup } from '$lib/server/db/schema';
 import { setError, superValidate } from 'sveltekit-superforms/server';
 
-import { updateGroupSchema } from './updateGroupSchema';
+import { updateGroupSchema } from '$lib/schema/updateGroupSchema';
 import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
