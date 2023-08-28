@@ -8,12 +8,13 @@
 	import RangeInput from '$lib/components/RangeInput.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import CheckboxInput from '$lib/components/CheckboxInput.svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	export let data;
 
 	const { form, errors, constraints, message, enhance, fields } = superForm<AddSnackSchemaType>(
 		data.form,
-		{ taintedMessage: null }
+		{ taintedMessage: null, onResult: async () => invalidateAll() }
 	);
 </script>
 
@@ -65,7 +66,7 @@
 			<NumberInput
 				type="number"
 				id="priceCents"
-				title="Price (cents) - ${$form.priceCents / 100.0}"
+				title="Price (cents) - ${($form.priceCents / 100.0).toFixed(2)}"
 				errorMessage={$errors.priceCents}
 				name="priceCents"
 				data-invalid={$errors.maxQuantity}

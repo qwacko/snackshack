@@ -65,7 +65,7 @@
 			<NumberInput
 				type="number"
 				id="priceCents"
-				title="Price (cents) - ${$form.priceCents / 100.0}"
+				title="Price (cents) - ${($form.priceCents / 100.0).toFixed(2)}"
 				errorMessage={$errors.priceCents}
 				name="priceCents"
 				data-invalid={$errors.maxQuantity}
