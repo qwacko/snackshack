@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Button from '$lib/components/Button.svelte';
 	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
-	import LinkButton from '$lib/components/LinkButton.svelte';
 	import SpreadButtons from '$lib/components/SpreadButtons.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import type { signupSchemaType } from '$lib/schema/signupSchema.js';
+	import { Button } from 'flowbite-svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 
 	export let data;
@@ -55,8 +54,8 @@
 		/>
 		<ErrorText message={$message} />
 		<SpreadButtons>
-			<Button type="submit" style="primary">Create</Button>
-			<LinkButton href="/users" style="secondary">Cancel</LinkButton>
+			<Button type="submit">Create</Button>
+			<Button href="/users" outline color="light">Cancel</Button>
 		</SpreadButtons>
 	</form>
 </CenterCard>
