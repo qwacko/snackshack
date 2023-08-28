@@ -1,6 +1,14 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 
-<form action="?/logout" method="post">
-	<button type="submit">Logout</button>
-</form>
+	export let data;
+
+	$: if (data.user && browser) {
+		goto('/groups');
+	} else if (browser) {
+		goto('/login');
+	}
+</script>
+
+Loading....

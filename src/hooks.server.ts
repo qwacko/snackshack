@@ -14,6 +14,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const [user, noAdmin] = await Promise.all([event.locals.auth.validate(), dbNoAdmins()]);
 
+	logging.info('Route Name', event.route);
+
+	if (event.route.id === '/') {
+		if (noAdmin) {
+			return Response.redirect(`${event.url.origin}/firstUser`, 302);
+		}
+		if (user) {
+			return Response.redirect(`${event.url.origin}/groups`, 302);
+		} else {
+			return Response.redirect(`${event.url.origin}/login`, 302);
+		}
+	}
+
 	if (noAdmin && !event.route.id?.startsWith('/(loggedOut)/firstUser')) {
 		logging.info('No Admin Exists - Redirecting to First User Creation');
 		return Response.redirect(`${event.url.origin}/firstUser`, 302);
