@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import PageLayout from '$lib/components/PageLayout.svelte';
+	import { Button, Input } from 'flowbite-svelte';
 
 	export let data;
 
@@ -11,100 +13,60 @@
 </script>
 
 <PageLayout title="Backups" size="lg">
-	<div class="column-div">
-		{#each displayFiles as backup}
-			<div class="row-div">
-				<form action="?/restore" method="post">
-					<input type="hidden" name="backupName" value={backup} />
-					<button type="submit">Restore</button>
-				</form>
-				<form action="?/delete" method="post">
-					<input type="hidden" name="backupName" value={backup} />
-					<button class="delete-button" type="submit">Delete</button>
-				</form>
-				<div class="flex-div">{backup}</div>
-			</div>
-		{/each}
-		<div class="row-div">
-			{#if pageNo > 1}
-				<button
-					on:click={() => {
-						if (pageNo > 1) pageNo--;
-					}}
-				>
-					Previous
-				</button>
-			{/if}
-			<div>Page {pageNo} of {numberPages}</div>
-			{#if pageNo < numberPages}
-				<button
-					on:click={() => {
-						if (pageNo < numberPages) pageNo++;
-					}}
-				>
-					Next
-				</button>
-			{/if}
-			<div class="input-wrap">
-				<form action="?/backup" method="post">
-					<input type="text" name="backupName" placeholder="Backup Name" />
-					<button type="submit">Create New Backup</button>
-				</form>
-			</div>
+	<div class="flex flex-row">
+		<div class="flex flex-grow" />
+		<div class="flex flex-col gap-2">
+			{#each displayFiles as backup}
+				<div class="flex flex-row items-center gap-2">
+					<form action="?/restore" method="post" class="flex" use:enhance>
+						<input type="hidden" name="backupName" value={backup} />
+						<Button type="submit">Restore</Button>
+					</form>
+					<form action="?/delete" method="post" class="flex" use:enhance>
+						<input type="hidden" name="backupName" value={backup} />
+						<Button type="submit" color="red" outline>Delete</Button>
+					</form>
+					<div class="flex grow flex-row">{backup}</div>
+				</div>
+			{/each}
 		</div>
+		<div class="flex grow" />
+	</div>
+	<div class="flex self-center">
+		{#if pageNo > 1}
+			<Button
+				on:click={() => {
+					if (pageNo > 1) pageNo--;
+				}}
+			>
+				Previous
+			</Button>
+		{/if}
+		<div>Page {pageNo} of {numberPages}</div>
+		{#if pageNo < numberPages}
+			<Button
+				on:click={() => {
+					if (pageNo < numberPages) pageNo++;
+				}}
+			>
+				Next
+			</Button>
+		{/if}
+	</div>
+	<div class="flex self-stretch">
+		<form
+			action="?/backup"
+			method="post"
+			use:enhance
+			class="flex w-full flex-row justify-center gap-2"
+		>
+			<Input
+				type="text"
+				name="backupName"
+				placeholder="Backup Name"
+				class="flex max-w-sm flex-grow"
+			/>
+			<Button type="submit">Create New Backup</Button>
+		</form>
 	</div>
 </PageLayout>
-
-<style>
-	.row-div {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		gap: 1rem;
-		padding: 0.2rem;
-		align-items: start;
-		height: 100%;
-	}
-	.column-div {
-		display: flex;
-		flex-direction: column;
-		justify-content: start;
-		align-items: start;
-		height: 100%;
-		width: 100%;
-	}
-
-	.flex-div {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100%;
-		width: 100%;
-	}
-
-	.delete-button {
-		background-color: #ff0000;
-		padding: 0.5rem;
-		border-radius: 0.375rem;
-	}
-
-	button {
-		background-color: #9dc0fd;
-		padding: 0.5rem;
-		border-radius: 0.375rem;
-	}
-
-	input {
-		padding: 0.5rem;
-		border-radius: 0.375rem;
-		border: 1px solid #9dc0fd;
-		margin-right: 0.5rem;
-	}
-
-	.input-wrap {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding-top: 0.8rem;
-	}
-</style>
