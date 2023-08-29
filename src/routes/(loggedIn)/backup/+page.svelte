@@ -1,5 +1,4 @@
 <script lang="ts">
-	import CenterCard from '$lib/components/CenterCard.svelte';
 	import PageLayout from '$lib/components/PageLayout.svelte';
 
 	export let data;

@@ -23,7 +23,8 @@ export const auth = lucia({
 	getUserAttributes: (data) => {
 		return {
 			username: data.username,
-			admin: Boolean(data.admin)
+			admin: Boolean(data.admin),
+			name: data.name
 		};
 	}
 });

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Button } from 'flowbite-svelte';
-	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
 	import SpreadButtons from '$lib/components/SpreadButtons.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
@@ -14,7 +13,7 @@
 	});
 </script>
 
-<PageLayout title="Create Account" size="xs">
+<PageLayout title="Create Account" size="xs" class="pt-10">
 	<form method="POST" class="flex flex-col space-y-4" autocomplete="off" use:enhance>
 		<TextInput
 			title="Name"

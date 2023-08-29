@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Button } from 'flowbite-svelte';
-	import CenterCard from '$lib/components/CenterCard.svelte';
 	import ErrorText from '$lib/components/ErrorText.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
@@ -13,7 +12,7 @@
 	});
 </script>
 
-<PageLayout title="Create First User" size="xs">
+<PageLayout title="Create First User" size="xs" class="pt-10">
 	<form method="POST" class="flex flex-col space-y-4" autocomplete="off" use:enhance>
 		<TextInput
 			title="Name"

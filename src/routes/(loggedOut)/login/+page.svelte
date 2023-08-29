@@ -12,7 +12,7 @@
 	});
 </script>
 
-<PageLayout title="Login" size="xs">
+<PageLayout title="Login" size="xs" class="pt-10">
 	<form method="POST" class="flex flex-col space-y-4" autocomplete="off" use:enhance>
 		<TextInput
 			title="Username"
