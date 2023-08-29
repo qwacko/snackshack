@@ -6,7 +6,7 @@
 </script>
 
 <PageLayout title="Snacks" size="lg">
-	<Button class="self-center" href="/snacks/add">Add</Button>
+	<Button class="self-center" href="/snacks/add" outline>Add</Button>
 	{#each data.snackGroups as group}
 		{@const snacksInGroup = data.snacks.filter((snack) => snack.snackGroupId === group.id)}
 		{@const groupLimit = group.limit ? group.limit : undefined}

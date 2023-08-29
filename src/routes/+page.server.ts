@@ -7,7 +7,7 @@ export const load = async ({ locals }) => {
 	logging.info("Running '/' Load Function");
 
 	if (user) {
-		throw redirect(302, '/groups');
+		throw redirect(302, '/home');
 	} else {
 		throw redirect(302, '/login');
 	}

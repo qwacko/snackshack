@@ -5,7 +5,7 @@
 	export let data;
 
 	$: if (data.user && browser) {
-		goto('/groups');
+		goto('/home');
 	} else if (browser) {
 		goto('/login');
 	}

@@ -9,7 +9,7 @@
 
 <PageLayout title="Users" size="lg">
 	{#if userIsAdmin}
-		<Button class="self-center" href="/users/create">Create User</Button>
+		<Button class="self-center" href="/users/create" outline>Create User</Button>
 	{/if}
 	<div class="flex w-full grid-cols-6 justify-center gap-4">
 		{#each data.users as currentUser}

@@ -19,7 +19,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			return Response.redirect(`${event.url.origin}/firstUser`, 302);
 		}
 		if (user) {
-			return Response.redirect(`${event.url.origin}/groups`, 302);
+			return Response.redirect(`${event.url.origin}/home`, 302);
 		} else {
 			return Response.redirect(`${event.url.origin}/login`, 302);
 		}
@@ -33,7 +33,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (!noAdmin && event.route.id?.startsWith('/(loggedOut)/firstUser')) {
 		logging.info('Admin Exists - Redirecting to Home');
 		if (user) {
-			return Response.redirect(`${event.url.origin}/users/${user.user.userId}`, 302);
+			return Response.redirect(`${event.url.origin}/home`, 302);
 		} else {
 			return Response.redirect(`${event.url.origin}/login`, 302);
 		}
@@ -46,7 +46,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (event.route.id?.startsWith('/(loggedOut)') && user) {
 		logging.info('User Logged In - Redirecting to User');
-		return Response.redirect(`${event.url.origin}/users/${user.user.userId}`, 302);
+		return Response.redirect(`${event.url.origin}/home`, 302);
 	}
 
 	return await resolve(event);
