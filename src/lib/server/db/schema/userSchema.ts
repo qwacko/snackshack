@@ -1,6 +1,6 @@
 import { sqliteTable, text, blob, integer } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
-import { orderLine, userOrderConfig } from './snackSchema';
+import { userOrderConfig } from './snackSchema';
 
 export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
@@ -15,8 +15,7 @@ export const userReferences = relations(user, ({ one, many }) => ({
 		references: [userOrderConfig.userId]
 	}),
 	sessions: many(session),
-	keys: many(key),
-	orderLines: many(orderLine)
+	keys: many(key)
 }));
 
 export const session = sqliteTable('user_session', {

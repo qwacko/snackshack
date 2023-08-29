@@ -72,20 +72,22 @@ export const buildURL = <ValidatedType extends Record<string, unknown>>(
 };
 
 const getUrlParams = (query: string): Record<string, unknown> =>
-	Array.from(new URLSearchParams(query)).reduce((p, [k, v]) => {
-		try {
-			const newValue: unknown = JSON.parse(v);
-			return { ...p, [k]: newValue };
-		} catch {
-			return { ...p, [k]: v };
-		}
-	}, {} as Record<string, unknown>);
+	Array.from(new URLSearchParams(query)).reduce(
+		(p, [k, v]) => {
+			try {
+				const newValue: unknown = JSON.parse(v);
+				return { ...p, [k]: newValue };
+			} catch {
+				return { ...p, [k]: v };
+			}
+		},
+		{} as Record<string, unknown>
+	);
 
 export const validateSearchParams = <ReturnType>(
 	url: URL,
 	validation: (search: Record<string, unknown>) => ReturnType
 ): ReturnType => {
 	const urlParamsObject = getUrlParams(url.search);
-
 	return validation(urlParamsObject);
 };

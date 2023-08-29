@@ -58,7 +58,6 @@ export const snack = sqliteTable(
 
 export const snackRelations = relations(snack, ({ one, many }) => ({
 	snackGroup: one(snackGroup, { fields: [snack.snackGroupId], references: [snackGroup.id] }),
-	orders: many(orderLine),
 	weekOptions: many(weekOptions)
 }));
 
