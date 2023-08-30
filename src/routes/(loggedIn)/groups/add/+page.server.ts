@@ -7,9 +7,17 @@ import { addGroupSchema } from '$lib/schema/addGroupSchema';
 import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
 
-export const load = () => ({
-	addForm: superValidate(addGroupSchema)
-});
+export const load = async ({ parent }) => {
+	const parentData = await parent();
+
+	if (!parentData.loggedInUser.admin) {
+		throw redirect(302, '/groups');
+	}
+
+	return {
+		addForm: superValidate(addGroupSchema)
+	};
+};
 
 export const actions = {
 	add: async ({ request }) => {

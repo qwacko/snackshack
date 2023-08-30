@@ -7,7 +7,13 @@ import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
-export const load = async ({ params }) => {
+export const load = async ({ params, parent }) => {
+	const parentData = await parent();
+
+	if (!parentData.loggedInUser.admin) {
+		throw redirect(302, '/groups');
+	}
+
 	const groupInfo = await db.query.snackGroup.findFirst({
 		where: (snackGroupInt, { eq }) => eq(snackGroupInt.id, params.id)
 	});

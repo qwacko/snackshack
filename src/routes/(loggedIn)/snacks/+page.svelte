@@ -7,7 +7,9 @@
 </script>
 
 <PageLayout title="Snacks" size="lg">
-	<Button class="self-center" href="/snacks/add" outline>Add</Button>
+	{#if data.loggedInUser?.admin}
+		<Button class="self-center" href="/snacks/add" outline>Add</Button>
+	{/if}
 	{#each data.snackGroups as group}
 		{@const snacksInGroup = data.snacks.filter((snack) => snack.snackGroupId === group.id)}
 		{@const groupLimit = group.limit ? group.limit : undefined}
@@ -23,7 +25,10 @@
 				{#each snacksInGroup as snack}
 					{@const snackLimit = snack.maxQuantity ? snack.maxQuantity : undefined}
 					{@const disabled = !snack.enabled || snack.priceCents === 0}
-					<Card href="/snacks/{snack.id}" class={disabled ? 'bg-gray-100' : ''}>
+					<Card
+						href={data.loggedInUser?.admin ? '/snacks/{snack.id}' : undefined}
+						class={disabled ? 'bg-gray-100' : ''}
+					>
 						<div class="flex flex-row items-center gap-1">
 							<SnackImage imageFilename={snack.imageFilename} snackTitle={snack.title} />
 							<div class="flex flex-col items-center justify-center gap-1">

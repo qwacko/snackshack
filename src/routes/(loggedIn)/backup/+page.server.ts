@@ -1,6 +1,12 @@
 import { backupDB, deleteBackup, getBackupList, restoreDB } from '$lib/server/db/db.js';
+import { redirect } from '@sveltejs/kit';
 
-export const load = async () => {
+export const load = async ({ parent }) => {
+	const parentData = await parent();
+
+	if (!parentData.loggedInUser.admin) {
+		throw redirect(302, '/home');
+	}
 	const backupFiles = getBackupList();
 
 	return { backupFiles };

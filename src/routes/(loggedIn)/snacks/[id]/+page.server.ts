@@ -8,7 +8,12 @@ import { logging } from '$lib/server/logging.js';
 import { writeFileSync } from 'fs';
 import { nanoid } from 'nanoid';
 
-export const load = async ({ params }) => {
+export const load = async ({ params, parent }) => {
+	const parentData = await parent();
+
+	if (!parentData.loggedInUser.admin) {
+		throw redirect(302, '/snacks');
+	}
 	const snack = await db.query.snack.findFirst({
 		where: (snackTable, { eq }) => eq(snackTable.id, params.id),
 		with: {

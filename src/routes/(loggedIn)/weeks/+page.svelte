@@ -65,13 +65,15 @@
 
 	{#if !data.weekData}
 		<div class="flex self-center"><Alert color="red">No Data For Week Yet</Alert></div>
-		{#if data.targetWeekInfo.allowWeekCreation}
-			<div class="flex self-center">
-				<form action="?/createWeek" method="POST" use:enhance>
-					<input type="hidden" name="date" value={$searchParams.value.date} />
-					<Button type="submit" outline>Create Week</Button>
-				</form>
-			</div>
+		{#if data.loggedInUser.admin}
+			{#if data.targetWeekInfo.allowWeekCreation}
+				<div class="flex self-center">
+					<form action="?/createWeek" method="POST" use:enhance>
+						<input type="hidden" name="date" value={$searchParams.value.date} />
+						<Button type="submit" outline>Create Week</Button>
+					</form>
+				</div>
+			{/if}
 		{/if}
 	{:else}
 		<div class="flex flex-col items-center gap-4">
