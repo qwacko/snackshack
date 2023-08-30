@@ -1,8 +1,8 @@
 import { weeksSchema } from '$lib/schema/paramsWeeksSchema';
 import { db } from '$lib/server/db/db.js';
 import { validateSearchParams } from '$lib/sveltekitSearchParams';
-import { and, gte, lte } from 'drizzle-orm';
-import { week } from '$lib/server/db/schema/snackSchema.js';
+import { and, gte, lte, notInArray } from 'drizzle-orm';
+import { snack, week } from '$lib/server/db/schema/snackSchema.js';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
 import { createWeek } from '../../../lib/server/actions/createWeek.js';
 import { logging } from '$lib/server/logging.js';
@@ -26,11 +26,21 @@ export const load = async ({ url }) => {
 		}
 	});
 
+	const includedSnackIds = weekData?.options.map((currentOption) => currentOption.snackId);
+
+	const excludedSnacks =
+		includedSnackIds && includedSnackIds.length > 0
+			? db.query.snack.findMany({
+					where: notInArray(snack.id, includedSnackIds)
+			  })
+			: undefined;
+
 	return {
 		searchData: data,
 		targetDate,
 		targetWeekInfo,
-		weekData
+		weekData,
+		excludedSnacks
 	};
 };
 

@@ -1,10 +1,12 @@
 import { db } from '$lib/server/db/db.js';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { superValidate, setError } from 'sveltekit-superforms/server';
 import { updateSnackSchema } from '$lib/schema/updateSnackSchema.js';
 import { snack } from '$lib/server/db/schema/snackSchema.js';
 import { eq } from 'drizzle-orm';
 import { logging } from '$lib/server/logging.js';
+import { writeFileSync } from 'fs';
+import { nanoid } from 'nanoid';
 
 export const load = async ({ params }) => {
 	const snack = await db.query.snack.findFirst({
@@ -27,7 +29,7 @@ export const load = async ({ params }) => {
 };
 
 export const actions = {
-	default: async ({ request, params }) => {
+	updateSnack: async ({ request, params }) => {
 		const form = await superValidate(request, updateSnackSchema);
 
 		if (!form.valid) {
@@ -42,5 +44,39 @@ export const actions = {
 		}
 
 		throw redirect(302, '/snacks');
+	},
+	updateImage: async ({ request }) => {
+		logging.info('Updating Image');
+		const formData = Object.fromEntries(await request.formData());
+
+		logging.info('Form Data', formData);
+
+		const formID = formData.id as string;
+
+		if (!formID) {
+			return fail(400, {
+				error: true,
+				message: 'You must provide a snack ID'
+			});
+		}
+
+		if (!(formData.file as File).name || (formData.file as File).name === 'undefined') {
+			return fail(400, {
+				error: true,
+				message: 'You must provide a file to upload'
+			});
+		}
+
+		if (formData.file instanceof File) {
+			const imageId = nanoid();
+			const imageFilename = `${imageId}-${formData.file.name}`;
+			logging.info('File is a file');
+			logging.info('File Info', formData.file);
+			logging.info('File Name', formData.file.name);
+			writeFileSync(`uploads/${imageFilename}`, Buffer.from(await formData.file.arrayBuffer()));
+
+			logging.info('Filename', imageFilename);
+			await db.update(snack).set({ imageFilename }).where(eq(snack.id, formID));
+		}
 	}
 };

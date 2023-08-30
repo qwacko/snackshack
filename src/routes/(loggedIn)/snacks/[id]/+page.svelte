@@ -2,7 +2,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { UpdateSnackSchemaType } from '$lib/schema/updateSnackSchema';
 	import TextInput from '$lib/components/TextInput.svelte';
-	import { Button } from 'flowbite-svelte';
+	import { Button, Fileupload, Label } from 'flowbite-svelte';
 	import SelectInput from '$lib/components/SelectInput.svelte';
 	import RangeInput from '$lib/components/RangeInput.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';
@@ -18,7 +18,33 @@
 </script>
 
 <PageLayout title="Update Snack" subtitle={data.snack.title} size="sm">
-	<form method="POST" class=" flex w-full flex-col gap-4" use:enhance>
+	<form
+		action="?/updateImage"
+		enctype="multipart/form-data"
+		method="POST"
+		class="flex flex-row items-center gap-2"
+	>
+		{#if data.snack.imageFilename}
+			<div class="flex">
+				<img
+					src={`/snacks/images/${data.snack.imageFilename}`}
+					class="max-w-32 max-h-32"
+					alt="{data.snack.title} Image"
+				/>
+			</div>
+		{/if}
+		<Fileupload
+			type="file"
+			name="file"
+			id="file"
+			accept="image/png, image/gif, image/jpeg"
+			class="flex grow"
+			required
+		/>
+		<input type="hidden" name="id" value={data.snack.id} />
+		<Button type="submit">Upload</Button>
+	</form>
+	<form method="POST" class=" flex w-full flex-col gap-4" action="?/updateSnack" use:enhance>
 		<TextInput
 			id="title"
 			title="Title"
