@@ -46,10 +46,7 @@ export const actions = {
 		throw redirect(302, '/snacks');
 	},
 	updateImage: async ({ request }) => {
-		logging.info('Updating Image');
 		const formData = Object.fromEntries(await request.formData());
-
-		logging.info('Form Data', formData);
 
 		const formID = formData.id as string;
 
@@ -70,12 +67,8 @@ export const actions = {
 		if (formData.file instanceof File) {
 			const imageId = nanoid();
 			const imageFilename = `${imageId}-${formData.file.name}`;
-			logging.info('File is a file');
-			logging.info('File Info', formData.file);
-			logging.info('File Name', formData.file.name);
 			writeFileSync(`uploads/${imageFilename}`, Buffer.from(await formData.file.arrayBuffer()));
 
-			logging.info('Filename', imageFilename);
 			await db.update(snack).set({ imageFilename }).where(eq(snack.id, formID));
 		}
 	}

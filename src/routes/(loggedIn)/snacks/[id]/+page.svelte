@@ -8,6 +8,7 @@
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import CheckboxInput from '$lib/components/CheckboxInput.svelte';
 	import PageLayout from '$lib/components/PageLayout.svelte';
+	import SnackImage from '$lib/components/SnackImage.svelte';
 
 	export let data;
 
@@ -24,23 +25,13 @@
 		method="POST"
 		class="flex flex-row items-center gap-2"
 	>
-		{#if data.snack.imageFilename}
-			<div class="flex">
-				<img
-					src={`/snacks/images/${data.snack.imageFilename}`}
-					class="max-w-32 max-h-32"
-					alt="{data.snack.title} Image"
-				/>
-			</div>
-		{/if}
-		<Fileupload
-			type="file"
-			name="file"
-			id="file"
-			accept="image/png, image/gif, image/jpeg"
-			class="flex grow"
-			required
+		<SnackImage
+			imageFilename={data.snack.imageFilename}
+			snackTitle={data.snack.title}
+			class="flex"
 		/>
+
+		<Fileupload type="file" name="file" id="file" accept="image/*" class="flex grow" required />
 		<input type="hidden" name="id" value={data.snack.id} />
 		<Button type="submit">Upload</Button>
 	</form>

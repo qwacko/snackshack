@@ -10,6 +10,7 @@
 	import { enhance } from '$app/forms';
 	import Card from '$lib/components/Card.svelte';
 	import { Card as FBCard } from 'flowbite-svelte';
+	import SnackImage from '$lib/components/SnackImage.svelte';
 
 	export let data;
 
@@ -79,17 +80,23 @@
 			<div class="flex flex-row gap-2">
 				{#each data.weekData.options.filter((opt) => opt.special) as currentOption}
 					<FBCard>
-						<div class="flex flex-col items-center gap-2">
-							<div class="flex">{currentOption.snack.title}</div>
-							<div class="flex flex-row gap-1">
-								<Badge color="yellow">
-									<div class="flex flex-row gap-1">
-										<div class="line-through">
-											${(currentOption.snack.priceCents / 100.0).toFixed(2)}
+						<div class="flex flex-row items-center gap-2">
+							<SnackImage
+								imageFilename={currentOption.snack.imageFilename}
+								snackTitle={currentOption.snack.title}
+							/>
+							<div class="flex flex-col items-center gap-2">
+								<div class="flex">{currentOption.snack.title}</div>
+								<div class="flex flex-row gap-1">
+									<Badge color="yellow">
+										<div class="flex flex-row gap-1">
+											<div class="line-through">
+												${(currentOption.snack.priceCents / 100.0).toFixed(2)}
+											</div>
+											${(currentOption.priceCents / 100.0).toFixed(2)}
 										</div>
-										${(currentOption.priceCents / 100.0).toFixed(2)}
-									</div>
-								</Badge>
+									</Badge>
+								</div>
 							</div>
 						</div>
 					</FBCard>
@@ -100,14 +107,20 @@
 			<div class="flex flex-row gap-2">
 				{#each data.weekData.options.filter((opt) => !opt.special) as currentOption}
 					<FBCard>
-						<div class="flex flex-col items-center gap-2">
-							<div class="">{currentOption.snack.title}</div>
-							<div class="flex flex-row gap-1">
-								<Badge color="green">
-									<div class="flex flex-row gap-1">
-										${(currentOption.priceCents / 100.0).toFixed(2)}
-									</div>
-								</Badge>
+						<div class="flex flex-row items-center gap-2">
+							<SnackImage
+								imageFilename={currentOption.snack.imageFilename}
+								snackTitle={currentOption.snack.title}
+							/>
+							<div class="flex flex-col items-center gap-2">
+								<div class="">{currentOption.snack.title}</div>
+								<div class="flex flex-row gap-1">
+									<Badge color="green">
+										<div class="flex flex-row gap-1">
+											${(currentOption.priceCents / 100.0).toFixed(2)}
+										</div>
+									</Badge>
+								</div>
 							</div>
 						</div>
 					</FBCard>
@@ -118,8 +131,14 @@
 				{#if data.excludedSnacks}
 					{#each data.excludedSnacks as currentOption}
 						<FBCard>
-							<div class="flex flex-col items-center gap-2">
-								<div class="">{currentOption.title}</div>
+							<div class="flex flex-row items-center gap-2">
+								<SnackImage
+									imageFilename={currentOption.imageFilename}
+									snackTitle={currentOption.title}
+								/>
+								<div class="flex flex-col items-center gap-2">
+									<div class="">{currentOption.title}</div>
+								</div>
 							</div>
 						</FBCard>
 					{/each}
