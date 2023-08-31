@@ -1,1 +1,1 @@
-export const load = async ({ locals }) => ({ loggedInUser: await locals.auth.validate() });
+export const load = async ({ locals }) => ({ loggedInUser: locals.user });

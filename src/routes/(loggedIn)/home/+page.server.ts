@@ -138,17 +138,14 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 	};
 };
 
-export const load = async ({ parent }) => {
-	const parentData = await parent();
-	const loggedInUser = await parentData.loggedInUser;
-
-	if (!loggedInUser) {
+export const load = async ({ locals }) => {
+	if (!locals.user) {
 		logging.info('No Logged In User');
 		return;
 	}
 
 	return {
-		orderingInfo: getWeekUserInfo({ targetDate: new Date(), userId: loggedInUser.user.userId })
+		orderingInfo: getWeekUserInfo({ targetDate: new Date(), userId: locals.user.userId })
 	};
 };
 
@@ -166,9 +163,9 @@ export const actions = {
 			return;
 		}
 
-		const authUser = await locals.auth.validate();
+		const authUser = locals.user;
 
-		if (!authUser || authUser.user.userId !== userId) {
+		if (!authUser || authUser.userId !== userId) {
 			logging.info('User Not Logged In', { userId, authUser });
 			return;
 		}
@@ -223,8 +220,9 @@ export const actions = {
 			quantity: 1
 		});
 	},
+
 	removeSnack: async ({ request, locals }) => {
-		const authUser = await locals.auth.validate();
+		const authUser = await locals.user;
 
 		if (!authUser) {
 			logging.info('No Auth User');
@@ -249,7 +247,7 @@ export const actions = {
 			return;
 		}
 
-		if (orderLineFound.userOrderConfig.userId !== authUser.user.userId) {
+		if (orderLineFound.userOrderConfig.userId !== authUser.userId) {
 			logging.info('Order Line Not For User');
 			return;
 		}

@@ -21,11 +21,8 @@ export const load = async ({ parent }) => {
 
 export const actions = {
 	setAdmin: async ({ params, locals }) => {
-		const authUser = await locals.auth.validate();
-		if (!authUser) {
-			return;
-		}
-		if (!authUser.user.admin || authUser.user.userId === params.id) {
+		const authUser = locals.user;
+		if (!authUser || !authUser.admin || authUser.userId === params.id) {
 			return;
 		}
 
@@ -34,11 +31,8 @@ export const actions = {
 		return;
 	},
 	removeAdmin: async ({ params, locals }) => {
-		const authUser = await locals.auth.validate();
-		if (!authUser) {
-			return;
-		}
-		if (!authUser.user.admin || authUser.user.userId === params.id) {
+		const authUser = locals.user;
+		if (!authUser || !authUser.admin || authUser.userId === params.id) {
 			return;
 		}
 
@@ -47,11 +41,8 @@ export const actions = {
 		return;
 	},
 	addOrderConfig: async ({ params, locals }) => {
-		const authUser = await locals.auth.validate();
-		if (!authUser) {
-			return;
-		}
-		if (!authUser.user.admin) {
+		const authUser = locals.user;
+		if (!authUser || !authUser.user.admin) {
 			return;
 		}
 
@@ -76,11 +67,8 @@ export const actions = {
 		return;
 	},
 	disableOrderConfig: async ({ params, locals }) => {
-		const authUser = await locals.auth.validate();
-		if (!authUser) {
-			return;
-		}
-		if (!authUser.user.admin) {
+		const authUser = locals.user;
+		if (!authUser || !authUser.admin) {
 			return;
 		}
 
@@ -109,12 +97,12 @@ export const actions = {
 	updateOrderingConfig: async ({ params, request, locals }) => {
 		const form = await superValidate(request, updateUserOrderingConfigSchema);
 
-		const authUser = await locals.auth.validate();
+		const authUser = locals.user;
 		if (!authUser) {
 			return setMessage(form, 'You must be logged in to do that');
 		}
 
-		if (!authUser.user.admin) {
+		if (!authUser.admin) {
 			return setMessage(form, 'You must be an admin to do that');
 		}
 
@@ -141,12 +129,12 @@ export const actions = {
 	updateName: async ({ params, request, locals }) => {
 		const usernameForm = await superValidate(request, updateNameSchema);
 
-		const authUser = await locals.auth.validate();
+		const authUser = locals.user;
 		if (!authUser) {
 			return setMessage(usernameForm, 'You must be logged in to do that');
 		}
 
-		if (!authUser.user.admin) {
+		if (!authUser.admin) {
 			return setMessage(usernameForm, 'You must be an admin to do that');
 		}
 
