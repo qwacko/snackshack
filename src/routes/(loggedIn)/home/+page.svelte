@@ -85,7 +85,7 @@
 							<form action="?/addSnack" method="POST" class="flex" use:enhance>
 								<input type="hidden" name="snackId" value={currentOption.id} />
 								<input type="hidden" name="weekId" value={data.orderingInfo.weekId} />
-								<input type="hidden" name="userId" value={data.loggedInUser?.user.userId} />
+								<input type="hidden" name="userId" value={data.loggedInUser?.userId} />
 								<button type="submit" disabled={currentOption.disabled}>
 									<Card
 										color={currentOption.disabled

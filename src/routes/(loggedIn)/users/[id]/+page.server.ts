@@ -42,7 +42,7 @@ export const actions = {
 	},
 	addOrderConfig: async ({ params, locals }) => {
 		const authUser = locals.user;
-		if (!authUser || !authUser.user.admin) {
+		if (!authUser || !authUser.admin) {
 			return;
 		}
 

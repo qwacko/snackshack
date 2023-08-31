@@ -14,8 +14,8 @@
 
 	$: activeUrl = $page.url.pathname;
 
-	$: userId = data.loggedInUser?.user.userId;
-	$: userIsAdmin = data.loggedInUser?.user.admin;
+	$: userId = data.loggedInUser?.userId;
+	$: userIsAdmin = data.loggedInUser?.admin;
 
 	$: userPage = activeUrl.startsWith('/users') && activeUrl === `/users/${userId}`;
 	$: usersPage = activeUrl.startsWith('/users') && !userPage;
@@ -67,7 +67,7 @@
 				>
 					<div class="flex=row flex items-center gap-1">
 						<UserIcon />
-						<div class="flex">{data.loggedInUser?.user.name}</div>
+						<div class="flex">{data.loggedInUser?.name}</div>
 						<Tooltip triggeredBy="[id=userLink]" type="light">Current User</Tooltip>
 					</div>
 				</Button>
