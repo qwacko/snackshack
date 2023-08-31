@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { logging } from '$lib/server/logging.js';
 import { writeFileSync } from 'fs';
 import { nanoid } from 'nanoid';
+import { serverEnv } from '$lib/server/serverEnv.js';
 
 export const load = async ({ params, parent }) => {
 	const parentData = await parent();
@@ -72,7 +73,10 @@ export const actions = {
 		if (formData.file instanceof File) {
 			const imageId = nanoid();
 			const imageFilename = `${imageId}-${formData.file.name}`;
-			writeFileSync(`uploads/${imageFilename}`, Buffer.from(await formData.file.arrayBuffer()));
+			writeFileSync(
+				`${serverEnv.UPLOAD_LOCATION}${imageFilename}`,
+				Buffer.from(await formData.file.arrayBuffer())
+			);
 
 			await db.update(snack).set({ imageFilename }).where(eq(snack.id, formID));
 		}

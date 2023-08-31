@@ -1,13 +1,12 @@
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import sqlite from 'better-sqlite3';
 import * as schema from './schema';
-import { DATABASE_FILE } from '$env/static/private';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { logging } from '../logging';
 import { serverEnv } from '../serverEnv';
 import fs from 'fs/promises';
 
-export const sqliteDatabase = sqlite(DATABASE_FILE);
+export const sqliteDatabase = sqlite(serverEnv.DATABASE_FILE);
 
 sqliteDatabase.pragma('journal_mode = WAL');
 
@@ -41,7 +40,7 @@ export const restoreDB = async (backupName: string) => {
 
 	await backupDB('Before Restore');
 
-	await fs.copyFile(`${targetDir}/${backupFile}`, DATABASE_FILE);
+	await fs.copyFile(`${targetDir}/${backupFile}`, serverEnv.DATABASE_FILE);
 
 	return;
 };
