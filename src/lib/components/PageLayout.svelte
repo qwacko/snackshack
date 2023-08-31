@@ -4,7 +4,7 @@
 	export let size: 'sm' | 'lg' | 'xs' = 'lg';
 </script>
 
-<div class="flex w-full justify-center px-4 {$$props.class}">
+<div class="mb-10 flex w-full justify-center px-4 {$$props.class}">
 	<div
 		class="flex w-full flex-col items-stretch gap-4"
 		class:max-w-4xl={size === 'lg'}

@@ -1,7 +1,130 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import PageLayout from '$lib/components/PageLayout.svelte';
+	import SnackImage from '$lib/components/SnackImage.svelte';
+	import { Accordion, AccordionItem, Badge, Card, Progressbar } from 'flowbite-svelte';
+
+	export let data;
+
+	$: spendingInfo = data.orderingInfo
+		? {
+				spent: (data.orderingInfo.spendingInfo.totalSpent / 100.0).toFixed(2),
+				totalSpend: (data.orderingInfo.spendingInfo.userSpend / 100.0).toFixed(2),
+				remainingSpend: (data.orderingInfo.spendingInfo.remainingSpend / 100.0).toFixed(2),
+				progress: (
+					(data.orderingInfo.spendingInfo.totalSpent / data.orderingInfo.spendingInfo.userSpend) *
+					100.0
+				).toString()
+		  }
+		: undefined;
 </script>
 
 <PageLayout title="Home">
-	<p class="mt-4">Welcome to the home page.</p>
+	{#if data.orderingInfo}
+		<div class="flex self-center">
+			{data.orderingInfo.dateInformation.startDate.toISOString().slice(0, 10)} - {data.orderingInfo.dateInformation.endDate
+				.toISOString()
+				.slice(0, 10)}
+		</div>
+		<Accordion multiple>
+			{#if spendingInfo}
+				<AccordionItem>
+					<div slot="header" class="mr-4 flex w-full flex-row items-center gap-4">
+						<div class="flex whitespace-nowrap">Current Order</div>
+						<Progressbar progress={spendingInfo.progress} class="flex flex-grow" />
+					</div>
+					<div class="flex w-full flex-col items-center gap-4">
+						<div class="flex flex-row items-center gap-2">
+							<div class="flex self-center">
+								${(data.orderingInfo.spendingInfo.totalSpent / 100.0).toFixed(2)} / ${(
+									data.orderingInfo.spendingInfo.userSpend / 100.0
+								).toFixed(2)} (${(data.orderingInfo.spendingInfo.remainingSpend / 100.0).toFixed(2)}
+								remaining)
+							</div>
+						</div>
+
+						<div class="flex flex-row flex-wrap gap-2 self-center">
+							{#each data.orderingInfo.currentOrderItems as currentOrder}
+								<form class="flex" action="?/removeSnack" method="POST" use:enhance>
+									<input type="hidden" name="id" value={currentOrder.id} />
+									<button type="submit">
+										<Card color={currentOrder.snackSpecial ? 'yellow' : undefined}>
+											<div class="flex flex-col items-center justify-center gap-2">
+												<SnackImage
+													imageFilename={currentOrder.snackImageFilename}
+													snackTitle={currentOrder.snackTitle}
+												/>
+												<h2>{currentOrder.snackTitle}</h2>
+												<Badge>${(currentOrder.snackPrice / 100.0).toFixed(2)}</Badge>
+											</div>
+										</Card>
+									</button>
+								</form>
+							{/each}
+						</div>
+					</div>
+				</AccordionItem>
+			{/if}
+
+			{#each data.orderingInfo.groupInfo as currentGroup}
+				{@const groupOptions = data.orderingInfo.snackInfo.filter(
+					(x) => x.groupId === currentGroup.id
+				)}
+				<AccordionItem>
+					<div class="flex flex-row gap-2" slot="header">
+						<div class="flex">{currentGroup.title}</div>
+						{#if currentGroup.limit}
+							<Badge color="red">Limit {currentGroup.limit}</Badge>
+							{#if currentGroup.limitReached}
+								<Badge color="red">Limit Reached</Badge>
+							{/if}
+						{/if}
+					</div>
+					<div class="flex flex-row flex-wrap gap-2 self-center">
+						{#each groupOptions as currentOption}
+							<form action="?/addSnack" method="POST" class="flex" use:enhance>
+								<input type="hidden" name="snackId" value={currentOption.id} />
+								<input type="hidden" name="weekId" value={data.orderingInfo.weekId} />
+								<input type="hidden" name="userId" value={data.loggedInUser?.user.userId} />
+								<button type="submit" disabled={currentOption.disabled}>
+									<Card
+										color={currentOption.disabled
+											? 'red'
+											: currentOption.special
+											? 'yellow'
+											: undefined}
+									>
+										<div class="flex flex-col items-center justify-center gap-2">
+											<SnackImage
+												imageFilename={currentOption.imageFilename}
+												snackTitle={currentOption.title}
+											/>
+											<h2>{currentOption.title}</h2>
+											{#if currentOption.special}
+												<Badge color="yellow">
+													<div class="flex flex-row gap-1">
+														<div class="flex line-through">
+															${(currentOption.priceCents / 100.0).toFixed(2)}
+														</div>
+														<div class="flex">
+															${(currentOption.normalPrice / 100.0).toFixed(2)}
+														</div>
+													</div>
+												</Badge>
+											{:else}
+												<Badge>${(currentOption.priceCents / 100.0).toFixed(2)}</Badge>
+											{/if}
+											{#if currentOption.limit}
+												<Badge color="red">Limit {currentOption.limit}</Badge>
+											{/if}
+										</div>
+									</Card>
+								</button>
+							</form>
+						{/each}
+					</div>
+				</AccordionItem>
+			{/each}
+		</Accordion>
+	{/if}
 </PageLayout>

@@ -65,7 +65,7 @@
 
 	{#if !data.weekData}
 		<div class="flex self-center"><Alert color="red">No Data For Week Yet</Alert></div>
-		{#if data.loggedInUser.admin}
+		{#if data.loggedInUser?.admin}
 			{#if data.targetWeekInfo.allowWeekCreation}
 				<div class="flex self-center">
 					<form action="?/createWeek" method="POST" use:enhance>
