@@ -12,3 +12,4 @@ db.db*
 /backup
 /uploads/*
 docker-compose.yml
+/dev-dist
