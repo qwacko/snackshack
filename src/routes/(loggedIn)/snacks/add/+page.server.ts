@@ -7,14 +7,17 @@ import { addSnackSchema } from '$lib/schema/addSnackSchema';
 import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ params, parent }) => {
+export const load = async ({ parent }) => {
 	const parentData = await parent();
 
-	if (!parentData.loggedInUser.admin) {
+	if (!parentData.loggedInUser?.admin) {
 		throw redirect(302, '/snacks');
 	}
-	form: superValidate(addSnackSchema)
-});
+
+	return {
+		form: superValidate(addSnackSchema)
+	};
+};
 
 export const actions = {
 	add: async ({ request }) => {

@@ -11,7 +11,7 @@ import { nanoid } from 'nanoid';
 export const load = async ({ params, parent }) => {
 	const parentData = await parent();
 
-	if (!parentData.loggedInUser.admin) {
+	if (!parentData.loggedInUser?.admin) {
 		throw redirect(302, '/snacks');
 	}
 	const snack = await db.query.snack.findFirst({
