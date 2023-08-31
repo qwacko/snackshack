@@ -8,13 +8,10 @@ import { logging } from '$lib/server/logging.js';
 import { writeFileSync } from 'fs';
 import { nanoid } from 'nanoid';
 import { serverEnv } from '$lib/server/serverEnv.js';
+import { authGuard } from '$lib/server/authGuard';
 
-export const load = async ({ params, parent }) => {
-	const parentData = await parent();
-
-	if (!parentData.loggedInUser?.admin) {
-		throw redirect(302, '/snacks');
-	}
+export const load = async ({ params, locals }) => {
+	authGuard({ locals, requireAdmin: true });
 	const snack = await db.query.snack.findFirst({
 		where: (snackTable, { eq }) => eq(snackTable.id, params.id),
 		with: {
@@ -43,6 +40,8 @@ export const actions = {
 		}
 
 		try {
+			//Deleted because it defaults to null which means this is cleared when it shouldn't be.
+			delete form.data.imageFilename;
 			await db.update(snack).set(form.data).where(eq(snack.id, params.id));
 		} catch (e) {
 			logging.error('Error Updating Snack', e);

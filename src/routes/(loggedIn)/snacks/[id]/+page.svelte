@@ -30,12 +30,12 @@
 			snackTitle={data.snack.title}
 			class="flex"
 		/>
-
 		<Fileupload type="file" name="file" id="file" accept="image/*" class="flex grow" required />
 		<input type="hidden" name="id" value={data.snack.id} />
 		<Button type="submit">Upload</Button>
 	</form>
 	<form method="POST" class=" flex w-full flex-col gap-4" action="?/updateSnack" use:enhance>
+		<input type="hidden" name="imageFilename" value={data.snack.imageFilename} />
 		<TextInput
 			id="title"
 			title="Title"

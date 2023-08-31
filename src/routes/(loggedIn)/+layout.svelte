@@ -35,16 +35,16 @@
 				<HomeIcon />
 				<Tooltip triggeredBy="[id=homeLink]" type="light">Home</Tooltip>
 			</Button>
-			<Button id="usersLink" href="/users" color={usersPage ? 'primary' : 'none'} class="p-3">
-				<UsersIcon />
-				<Tooltip triggeredBy="[id=usersLink]" type="light">Users</Tooltip>
-			</Button>
-			<Button id="weeksLink" href="/weeks" color={weeksPage ? 'primary' : 'none'} class="p-3">
-				<WeeksIcon />
-				<Tooltip triggeredBy="[id=weeksLink]" type="light">Weeks</Tooltip>
-			</Button>
-
 			{#if userIsAdmin}
+				<Button id="usersLink" href="/users" color={usersPage ? 'primary' : 'none'} class="p-3">
+					<UsersIcon />
+					<Tooltip triggeredBy="[id=usersLink]" type="light">Users</Tooltip>
+				</Button>
+				<Button id="weeksLink" href="/weeks" color={weeksPage ? 'primary' : 'none'} class="p-3">
+					<WeeksIcon />
+					<Tooltip triggeredBy="[id=weeksLink]" type="light">Weeks</Tooltip>
+				</Button>
+
 				<Button id="snacksLink" href="/snacks" color={snacksPage ? 'primary' : 'none'} class="p-3">
 					<SnacksIcon />
 					<Tooltip triggeredBy="[id=snacksLink]" type="light">Snacks</Tooltip>

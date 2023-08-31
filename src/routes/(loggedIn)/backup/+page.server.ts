@@ -1,10 +1,8 @@
+import { authGuard } from '$lib/server/authGuard.js';
 import { backupDB, deleteBackup, getBackupList, restoreDB } from '$lib/server/db/db.js';
-import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ locals }) => {
-	if (!locals.user?.admin) {
-		throw redirect(302, '/home');
-	}
+	authGuard({ locals, requireAdmin: true });
 	const backupFiles = getBackupList();
 
 	return { backupFiles };

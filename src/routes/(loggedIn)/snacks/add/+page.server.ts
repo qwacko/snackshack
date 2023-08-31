@@ -6,13 +6,10 @@ import { nanoid } from 'nanoid';
 import { addSnackSchema } from '$lib/schema/addSnackSchema';
 import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
+import { authGuard } from '$lib/server/authGuard.js';
 
-export const load = async ({ parent }) => {
-	const parentData = await parent();
-
-	if (!parentData.loggedInUser?.admin) {
-		throw redirect(302, '/snacks');
-	}
+export const load = async ({ locals }) => {
+	authGuard({ locals, requireAdmin: true });
 
 	return {
 		form: superValidate(addSnackSchema)

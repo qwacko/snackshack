@@ -1,5 +1,6 @@
 import { addDays } from '$lib/dateHelper.js';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
+import { authGuard } from '$lib/server/authGuard.js';
 import { db } from '$lib/server/db/db.js';
 import { orderLine, userOrderConfig, week } from '$lib/server/db/schema/snackSchema.js';
 import { user } from '$lib/server/db/schema/userSchema';
@@ -90,10 +91,12 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 			throw new Error('No Group Found');
 		}
 
+		const limitReached = Boolean(
+			currentOption.snack.maxQuantity && orderCount >= currentOption.snack.maxQuantity
+		);
+
 		const disabled = Boolean(
-			group.limitReached ||
-				(currentOption.snack.maxQuantity && orderCount >= currentOption.snack.maxQuantity) ||
-				currentOption.priceCents > remainingSpend
+			group.limitReached || limitReached || currentOption.priceCents > remainingSpend
 		);
 
 		return {
@@ -102,12 +105,14 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 			priceCents: currentOption.priceCents,
 			special: currentOption.special,
 			normalPrice: currentOption.snack.priceCents,
+			specialPrice: currentOption.priceCents,
 			orderCount,
 			group: group.title,
 			groupId: group.id,
 			disabled,
 			imageFilename: currentOption.snack.imageFilename,
-			limit: currentOption.snack.maxQuantity
+			limit: currentOption.snack.maxQuantity,
+			limitReached
 		};
 	});
 
@@ -117,16 +122,19 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 		userSpend
 	};
 
-	const currentOrderItems = weekInformation.orders.map((currentOrder) => {
-		return {
-			id: currentOrder.id,
-			snackId: currentOrder.snack.id,
-			snackTitle: currentOrder.snack.snack.title,
-			snackPrice: currentOrder.snack.priceCents,
-			snackSpecial: currentOrder.snack.special,
-			snackImageFilename: currentOrder.snack.snack.imageFilename
-		};
-	});
+	const currentOrderItems = weekInformation.orders
+		.map((currentOrder) => {
+			return {
+				id: currentOrder.id,
+				snackId: currentOrder.snack.id,
+				snackTitle: currentOrder.snack.snack.title,
+				snackPrice: currentOrder.snack.priceCents,
+				snackSpecial: currentOrder.snack.special,
+				snackImageFilename: currentOrder.snack.snack.imageFilename,
+				snackNormalPrice: currentOrder.snack.snack.priceCents
+			};
+		})
+		.sort((a, b) => a.snackTitle.localeCompare(b.snackTitle));
 
 	return {
 		dateInformation,
@@ -139,20 +147,15 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 };
 
 export const load = async ({ locals }) => {
-	if (!locals.user) {
-		logging.info('No Logged In User');
-		return;
-	}
+	const user = authGuard({ locals, requireAdmin: false });
 
 	return {
-		orderingInfo: getWeekUserInfo({ targetDate: new Date(), userId: locals.user.userId })
+		orderingInfo: getWeekUserInfo({ targetDate: new Date(), userId: user.userId })
 	};
 };
 
 export const actions = {
 	addSnack: async ({ request, locals }) => {
-		logging.info('Adding Snack');
-
 		const form = await request.formData();
 		const snackId = form.get('snackId')?.toString();
 		const weekId = form.get('weekId')?.toString();

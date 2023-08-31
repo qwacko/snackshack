@@ -2,7 +2,7 @@
 	import PageLayout from '$lib/components/PageLayout.svelte';
 	import { weeksSchema } from '$lib/schema/paramsWeeksSchema.js';
 	import { validatedSearchParamsStore } from '$lib/sveltekitSearchParams.js';
-	import { Button, Alert, Badge } from 'flowbite-svelte';
+	import { Button, Alert, Badge, Accordion, AccordionItem } from 'flowbite-svelte';
 	import { addDays } from '$lib/dateHelper.js';
 	import PrevIcon from '$lib/components/icons/PrevIcon.svelte';
 	import NextIcon from '$lib/components/icons/NextIcon.svelte';
@@ -11,6 +11,7 @@
 	import Card from '$lib/components/Card.svelte';
 	import { Card as FBCard } from 'flowbite-svelte';
 	import SnackImage from '$lib/components/SnackImage.svelte';
+	import DisplaySnack from '$lib/components/DisplaySnack.svelte';
 
 	export let data;
 
@@ -76,76 +77,88 @@
 			{/if}
 		{/if}
 	{:else}
-		<div class="flex flex-col items-center gap-4">
-			<div class="flex text-2xl">Week Options</div>
-			<div class="flex text-xl">On Sale</div>
-			<div class="flex flex-row gap-2">
-				{#each data.weekData.options.filter((opt) => opt.special) as currentOption}
-					<FBCard>
-						<div class="flex flex-row items-center gap-2">
-							<SnackImage
+		<div class="flex w-full flex-col items-center gap-4">
+			<Accordion class="w-full">
+				<AccordionItem>
+					<div slot="header">On Sale</div>
+					<div class="flex flex-row items-stretch justify-center gap-2">
+						{#each data.weekData.options.filter((opt) => opt.special) as currentOption}
+							<DisplaySnack
+								limit={currentOption.snack.maxQuantity}
+								normalPrice={currentOption.snack.priceCents}
+								specialPrice={currentOption.priceCents}
+								title={currentOption.snack.title}
 								imageFilename={currentOption.snack.imageFilename}
-								snackTitle={currentOption.snack.title}
+								special={currentOption.special}
+								disabled={false}
 							/>
-							<div class="flex flex-col items-center gap-2">
-								<div class="flex">{currentOption.snack.title}</div>
-								<div class="flex flex-row gap-1">
-									<Badge color="yellow">
-										<div class="flex flex-row gap-1">
-											<div class="line-through">
-												${(currentOption.snack.priceCents / 100.0).toFixed(2)}
-											</div>
-											${(currentOption.priceCents / 100.0).toFixed(2)}
-										</div>
-									</Badge>
-								</div>
-							</div>
-						</div>
-					</FBCard>
-				{/each}
-			</div>
-
-			<div class="flex text-xl">Normal Price</div>
-			<div class="flex flex-row gap-2">
-				{#each data.weekData.options.filter((opt) => !opt.special) as currentOption}
-					<FBCard>
-						<div class="flex flex-row items-center gap-2">
-							<SnackImage
+						{/each}
+					</div>
+				</AccordionItem>
+				<AccordionItem>
+					<div slot="header">Normal Price</div>
+					<div class="flex flex-row items-stretch justify-center gap-2">
+						{#each data.weekData.options.filter((opt) => !opt.special) as currentOption}
+							<DisplaySnack
+								limit={currentOption.snack.maxQuantity}
+								normalPrice={currentOption.snack.priceCents}
+								specialPrice={currentOption.priceCents}
+								title={currentOption.snack.title}
 								imageFilename={currentOption.snack.imageFilename}
-								snackTitle={currentOption.snack.title}
+								special={currentOption.special}
+								disabled={false}
 							/>
-							<div class="flex flex-col items-center gap-2">
-								<div class="">{currentOption.snack.title}</div>
-								<div class="flex flex-row gap-1">
-									<Badge color="green">
-										<div class="flex flex-row gap-1">
-											${(currentOption.priceCents / 100.0).toFixed(2)}
-										</div>
-									</Badge>
-								</div>
-							</div>
-						</div>
-					</FBCard>
-				{/each}
-			</div>
-			<div class="flex text-xl">Excluded Snacks</div>
-			<div class="flex flex-row gap-2">
-				{#if data.excludedSnacks}
-					{#each data.excludedSnacks as currentOption}
-						<FBCard>
-							<div class="flex flex-row items-center gap-2">
-								<SnackImage
+						{/each}
+					</div>
+				</AccordionItem>
+				<AccordionItem>
+					<div slot="header">Excluded Snacks</div>
+					<div class="flex flex-row items-stretch justify-center gap-2">
+						{#if data.excludedSnacks}
+							{#each data.excludedSnacks as currentOption}
+								<DisplaySnack
+									limit={currentOption.maxQuantity}
+									normalPrice={currentOption.priceCents}
+									specialPrice={currentOption.salePrice}
+									title={currentOption.title}
 									imageFilename={currentOption.imageFilename}
-									snackTitle={currentOption.title}
+									special={false}
+									disabled={true}
 								/>
-								<div class="flex flex-col items-center gap-2">
-									<div class="">{currentOption.title}</div>
-								</div>
+							{/each}
+						{/if}
+					</div>
+				</AccordionItem>
+				{#if data.usersWithOrder}
+					{#each data.usersWithOrder as currentUser}
+						{@const userOrderItems = data.weekData.orders.filter(
+							(order) => order.userOrderConfig.user.id === currentUser.id
+						)}
+						{@const userSpend = userOrderItems.reduce(
+							(acc, orderItem) => acc + orderItem.snack.priceCents,
+							0
+						)}
+						<AccordionItem>
+							<div slot="header">
+								{currentUser.name} Order - ${(userSpend / 100.0).toFixed(2)}
 							</div>
-						</FBCard>
+							<div class="flex flex-row items-stretch justify-center gap-2">
+								{#each userOrderItems as currentOrderItem}
+									<DisplaySnack
+										disabled={false}
+										special={currentOrderItem.snack.special}
+										imageFilename={currentOrderItem.snack.snack.imageFilename}
+										limit={currentOrderItem.snack.snack.maxQuantity}
+										normalPrice={currentOrderItem.snack.snack.priceCents}
+										priceCents={currentOrderItem.snack.priceCents}
+										title={currentOrderItem.snack.snack.title}
+									/>
+								{/each}
+							</div>
+						</AccordionItem>
 					{/each}
 				{/if}
-			</div>
+			</Accordion>
 		</div>
 	{/if}
 </PageLayout>

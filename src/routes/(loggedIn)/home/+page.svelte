@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import DisplaySnack from '$lib/components/DisplaySnack.svelte';
 	import PageLayout from '$lib/components/PageLayout.svelte';
 	import SnackImage from '$lib/components/SnackImage.svelte';
 	import { Accordion, AccordionItem, Badge, Card, Progressbar } from 'flowbite-svelte';
@@ -43,21 +44,22 @@
 							</div>
 						</div>
 
-						<div class="flex flex-row flex-wrap gap-2 self-center">
+						<div class="flex flex-row flex-wrap justify-center gap-2 self-center">
 							{#each data.orderingInfo.currentOrderItems as currentOrder}
 								<form class="flex" action="?/removeSnack" method="POST" use:enhance>
 									<input type="hidden" name="id" value={currentOrder.id} />
 									<button type="submit">
-										<Card color={currentOrder.snackSpecial ? 'yellow' : undefined}>
-											<div class="flex flex-col items-center justify-center gap-2">
-												<SnackImage
-													imageFilename={currentOrder.snackImageFilename}
-													snackTitle={currentOrder.snackTitle}
-												/>
-												<h2>{currentOrder.snackTitle}</h2>
-												<Badge>${(currentOrder.snackPrice / 100.0).toFixed(2)}</Badge>
-											</div>
-										</Card>
+										<DisplaySnack
+											title={currentOrder.snackTitle}
+											imageFilename={currentOrder.snackImageFilename}
+											priceCents={currentOrder.snackPrice}
+											specialPrice={currentOrder.snackPrice}
+											special={currentOrder.snackSpecial}
+											disabled={false}
+											limit={0}
+											normalPrice={currentOrder.snackNormalPrice}
+											class="h-full"
+										/>
 									</button>
 								</form>
 							{/each}
@@ -80,45 +82,14 @@
 							{/if}
 						{/if}
 					</div>
-					<div class="flex flex-row flex-wrap gap-2 self-center">
+					<div class="flex flex-row flex-wrap items-stretch justify-center gap-2">
 						{#each groupOptions as currentOption}
 							<form action="?/addSnack" method="POST" class="flex" use:enhance>
 								<input type="hidden" name="snackId" value={currentOption.id} />
 								<input type="hidden" name="weekId" value={data.orderingInfo.weekId} />
 								<input type="hidden" name="userId" value={data.loggedInUser?.userId} />
 								<button type="submit" disabled={currentOption.disabled}>
-									<Card
-										color={currentOption.disabled
-											? 'red'
-											: currentOption.special
-											? 'yellow'
-											: undefined}
-									>
-										<div class="flex flex-col items-center justify-center gap-2">
-											<SnackImage
-												imageFilename={currentOption.imageFilename}
-												snackTitle={currentOption.title}
-											/>
-											<h2>{currentOption.title}</h2>
-											{#if currentOption.special}
-												<Badge color="yellow">
-													<div class="flex flex-row gap-1">
-														<div class="flex line-through">
-															${(currentOption.priceCents / 100.0).toFixed(2)}
-														</div>
-														<div class="flex">
-															${(currentOption.normalPrice / 100.0).toFixed(2)}
-														</div>
-													</div>
-												</Badge>
-											{:else}
-												<Badge>${(currentOption.priceCents / 100.0).toFixed(2)}</Badge>
-											{/if}
-											{#if currentOption.limit}
-												<Badge color="red">Limit {currentOption.limit}</Badge>
-											{/if}
-										</div>
-									</Card>
+									<DisplaySnack {...currentOption} class="h-full" />
 								</button>
 							</form>
 						{/each}
