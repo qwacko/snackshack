@@ -14,8 +14,8 @@
 
 	$: activeUrl = $page.url.pathname;
 
-	$: userId = data.loggedInUser?.user.userId;
-	$: userIsAdmin = data.loggedInUser?.user.admin;
+	$: userId = data.loggedInUser?.userId;
+	$: userIsAdmin = data.loggedInUser?.admin;
 
 	$: userPage = activeUrl.startsWith('/users') && activeUrl === `/users/${userId}`;
 	$: usersPage = activeUrl.startsWith('/users') && !userPage;
@@ -35,16 +35,16 @@
 				<HomeIcon />
 				<Tooltip triggeredBy="[id=homeLink]" type="light">Home</Tooltip>
 			</Button>
-			<Button id="usersLink" href="/users" color={usersPage ? 'primary' : 'none'} class="p-3">
-				<UsersIcon />
-				<Tooltip triggeredBy="[id=usersLink]" type="light">Users</Tooltip>
-			</Button>
-			<Button id="weeksLink" href="/weeks" color={weeksPage ? 'primary' : 'none'} class="p-3">
-				<WeeksIcon />
-				<Tooltip triggeredBy="[id=weeksLink]" type="light">Weeks</Tooltip>
-			</Button>
-
 			{#if userIsAdmin}
+				<Button id="usersLink" href="/users" color={usersPage ? 'primary' : 'none'} class="p-3">
+					<UsersIcon />
+					<Tooltip triggeredBy="[id=usersLink]" type="light">Users</Tooltip>
+				</Button>
+				<Button id="weeksLink" href="/weeks" color={weeksPage ? 'primary' : 'none'} class="p-3">
+					<WeeksIcon />
+					<Tooltip triggeredBy="[id=weeksLink]" type="light">Weeks</Tooltip>
+				</Button>
+
 				<Button id="snacksLink" href="/snacks" color={snacksPage ? 'primary' : 'none'} class="p-3">
 					<SnacksIcon />
 					<Tooltip triggeredBy="[id=snacksLink]" type="light">Snacks</Tooltip>
@@ -67,7 +67,7 @@
 				>
 					<div class="flex=row flex items-center gap-1">
 						<UserIcon />
-						<div class="flex">{data.loggedInUser?.user.name}</div>
+						<div class="flex">{data.loggedInUser?.name}</div>
 						<Tooltip triggeredBy="[id=userLink]" type="light">Current User</Tooltip>
 					</div>
 				</Button>

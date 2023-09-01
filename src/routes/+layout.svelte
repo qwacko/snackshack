@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '../app.postcss';
+	import '../app.css';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { onMount } from 'svelte';
 
@@ -24,12 +24,6 @@
 	});
 
 	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
-	// $: homePage = $page.url.pathname === '/';
-	// $: user = $page.url.pathname.startsWith(`/users/${data?.user?.userId}`);
-	// $: backup = $page.route.id?.startsWith('/(loggedIn)/backup');
-	// $: users = $page.route.id?.startsWith('/(loggedIn)/users') && !user;
-	// $: login = $page.route.id?.startsWith('/(loggedOut)');
-	// $: paramsPage = $page.route.id?.startsWith('/(open)/params');
 </script>
 
 <svelte:head>

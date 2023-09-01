@@ -3,8 +3,10 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { signupSchema } from '$lib/schema/signupSchema';
 import { createUserHandler } from '$lib/server/createUserHandler';
 import { dbNoAdmins } from '$lib/server/db/actions/firstUser';
+import { useCombinedAuthGuard } from '$lib/server/authGuard';
 
-export const load = async () => {
+export const load = async ({ locals, route }) => {
+	useCombinedAuthGuard({ locals, route });
 	const form = await superValidate(signupSchema);
 	return { form };
 };

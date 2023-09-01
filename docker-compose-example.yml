@@ -1,20 +1,18 @@
-version: "3.8"
-name: "sveltekite-lucia-starter"
+version: '3.8'
+name: 'snackShack'
 
 services:
-  sveltekit-lucia-starter:
-    image: sveltekit-lucia-starter
-    build: 
-      context: ./
+  snackShack:
+    image: ghcr.io/qwacko/snackshack:master
     environment:
       - DATABASE_FILE=/app/db/db.db
       - ORIGIN=https://www.example.com
       - PORT=3000
       - ALLOW_SIGNUP=false
+      - FIRST_DAY_OF_WEEK="SUNDAY"
+      - ORDER_DAY="SUNDAY"
     volumes:
       - ./db/:/app/db
     ports:
       - 3000:3000
     restart: unless-stopped
-  
-  

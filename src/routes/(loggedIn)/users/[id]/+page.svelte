@@ -145,5 +145,7 @@
 			</Card>
 		{/if}
 	{/if}
-	<Button href="/users" outline color="light">Back</Button>
+	{#if data.loggedInUser?.admin}
+		<Button href="/users" outline color="light">Back</Button>{:else}
+		<Button href="/home" outline color="light">Back</Button>{/if}
 </PageLayout>

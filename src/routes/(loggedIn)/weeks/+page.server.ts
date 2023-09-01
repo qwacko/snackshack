@@ -4,10 +4,13 @@ import { validateSearchParams } from '$lib/sveltekitSearchParams';
 import { and, gte, lte, notInArray } from 'drizzle-orm';
 import { snack, week } from '$lib/server/db/schema/snackSchema.js';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
-import { createWeek } from '../../../lib/server/actions/createWeek.js';
+import { createWeek } from '$lib/server/actions/createWeek.js';
 import { logging } from '$lib/server/logging.js';
+import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 
-export const load = async ({ url }) => {
+export const load = async ({ locals, route, url }) => {
+	useCombinedAuthGuard({ locals, route });
+
 	const processedParams = validateSearchParams(url, weeksSchema.passthrough().parse);
 
 	const data = processedParams;
@@ -22,9 +25,30 @@ export const load = async ({ url }) => {
 		),
 		with: {
 			options: { with: { snack: true } },
-			orders: { with: { snack: true, userOrderConfig: { with: { user: true } } } }
+			orders: {
+				with: { snack: { with: { snack: true } }, userOrderConfig: { with: { user: true } } }
+			}
 		}
 	});
+
+	const usersWithOrder = weekData
+		? weekData.orders
+				.map((currentOrder) => currentOrder.userOrderConfig.user.id)
+				.filter((user) => user)
+				.reduce((accumulator, currentValue) => {
+					if (accumulator.includes(currentValue)) {
+						return accumulator;
+					}
+
+					return [...accumulator, currentValue];
+				}, [] as string[])
+				.map((userId) => ({
+					id: userId,
+					name: weekData?.orders.find(
+						(currentOrder) => currentOrder.userOrderConfig.userId === userId
+					)?.userOrderConfig.user.name
+				}))
+		: undefined;
 
 	const includedSnackIds = weekData?.options.map((currentOption) => currentOption.snackId);
 
@@ -40,7 +64,8 @@ export const load = async ({ url }) => {
 		targetDate,
 		targetWeekInfo,
 		weekData,
-		excludedSnacks
+		excludedSnacks,
+		usersWithOrder
 	};
 };
 

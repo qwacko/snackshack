@@ -6,13 +6,13 @@
 </script>
 
 <PageLayout title="Groups" size="lg">
-	{#if data.loggedInUser?.user.admin}
+	{#if data.loggedInUser?.admin}
 		<Button href="/groups/add" outline class="self-center">Add</Button>
 	{/if}
 	{#if data.groups.length > 0}
 		<div class="flex flex-row items-stretch justify-center gap-4">
 			{#each data.groups as group}
-				<Card href={data.loggedInUser?.user.admin ? '/groups/{group.id}' : undefined}>
+				<Card href={data.loggedInUser?.admin ? '/groups/{group.id}' : undefined}>
 					<div class="flex flex-col items-center justify-center gap-2">
 						<h2>{group.title}</h2>
 						{#if group.limit && group.limit > 0}
