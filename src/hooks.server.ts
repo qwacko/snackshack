@@ -17,10 +17,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.user = user?.user;
 
 	if (!event.route.id) {
-		throw redirect(302, '/(loggedOut)/login');
+		throw redirect(302, '/login');
 	}
 	if (event.route.id !== '/(loggedOut)/firstUser' && noAdmin) {
-		throw redirect(302, '/(loggedOut)/firstUser');
+		throw redirect(302, '/firstUser');
 	}
 
 	if (event.route.id) {
