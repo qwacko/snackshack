@@ -6,6 +6,7 @@ import { db } from '$lib/server/db/db.js';
 import { orderLine, userOrderConfig, week } from '$lib/server/db/schema/snackSchema.js';
 import { user } from '$lib/server/db/schema/userSchema';
 import { logging } from '$lib/server/logging.js';
+import { serverEnv } from '$lib/server/serverEnv';
 import { validateSearchParams } from '$lib/sveltekitSearchParams';
 import { redirect } from '@sveltejs/kit';
 import { eq, and, lte, gte } from 'drizzle-orm';
@@ -26,7 +27,12 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 
 	const userSpend = userInformation?.userOrderConfig.amount;
 
-	const dateInformation = await generateDateInformation(targetDate);
+	const dateInformation = await generateDateInformation({
+		targetDate,
+		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
+		nowDate: new Date(),
+		orderDay: serverEnv.ORDER_DAY
+	});
 	const userOrderRow = await db.query.userOrderConfig.findFirst({
 		where: eq(userOrderConfig.userId, userId)
 	});
@@ -164,7 +170,12 @@ export const load = async ({ locals, route, url }) => {
 	const data = processedParams;
 
 	const targetDate = new Date(data.date);
-	const targetWeekInfo = await generateDateInformation(targetDate);
+	const targetWeekInfo = await generateDateInformation({
+		targetDate,
+		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
+		nowDate: new Date(),
+		orderDay: serverEnv.ORDER_DAY
+	});
 
 	return {
 		orderingInfo: getWeekUserInfo({ targetDate, userId: locals.user.userId }),
@@ -283,9 +294,12 @@ export const actions = {
 			return;
 		}
 
-		const dateInformation = await generateDateInformation(
-			addDays(orderLineFound.week.startDate, 3)
-		);
+		const dateInformation = await generateDateInformation({
+			targetDate: addDays(orderLineFound.week.startDate, 3),
+			firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
+			nowDate: new Date(),
+			orderDay: serverEnv.ORDER_DAY
+		});
 
 		if (!dateInformation.canOrder) {
 			logging.info('Ordering Closed For The Week');

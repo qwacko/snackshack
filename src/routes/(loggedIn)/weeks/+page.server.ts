@@ -7,6 +7,7 @@ import { generateDateInformation } from '$lib/server/actions/generateDateInforma
 import { createWeek } from '$lib/server/actions/createWeek.js';
 import { logging } from '$lib/server/logging.js';
 import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
+import { serverEnv } from '$lib/server/serverEnv.js';
 
 export const load = async ({ locals, route, url }) => {
 	useCombinedAuthGuard({ locals, route });
@@ -16,7 +17,12 @@ export const load = async ({ locals, route, url }) => {
 	const data = processedParams;
 
 	const targetDate = new Date(data.date);
-	const targetWeekInfo = await generateDateInformation(targetDate);
+	const targetWeekInfo = await generateDateInformation({
+		targetDate: targetDate,
+		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
+		nowDate: new Date(),
+		orderDay: serverEnv.ORDER_DAY
+	});
 
 	const weekData = await db.query.week.findFirst({
 		where: and(

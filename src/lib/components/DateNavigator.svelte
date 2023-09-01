@@ -4,7 +4,6 @@
 	import TodayIcon from '$lib/components/icons/TodayIcon.svelte';
 	import { Badge, Button } from 'flowbite-svelte';
 
-	export let showPrevWeek: boolean;
 	export let showNextWeek: boolean;
 	export let prevWeekURL: string;
 	export let nextWeekURL: string;
@@ -21,11 +20,9 @@
 <div class="flex flex-row items-center justify-center gap-2">
 	<div class="flex w-10 flex-row justify-center" />
 	<div class="flex w-10 flex-row justify-center">
-		{#if showPrevWeek}
-			<Button href={prevWeekURL} outline class="p-2">
-				<PrevIcon />
-			</Button>
-		{/if}
+		<Button href={prevWeekURL} outline class="p-2">
+			<PrevIcon />
+		</Button>
 	</div>
 	<div class="flex w-52 flex-col items-center gap-1">
 		{#if orderingOpen}
