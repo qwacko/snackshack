@@ -1,4 +1,4 @@
-import { authGuard } from '$lib/server/authGuard';
+import { useCombinedAuthGuard } from '$lib/server/authGuard';
 import { db } from '$lib/server/db/db.js';
 import { auth } from '$lib/server/lucia.js';
 import { redirect } from '@sveltejs/kit';
@@ -23,8 +23,8 @@ const passwordSchema = z
 
 export type passwordSchemaType = typeof passwordSchema;
 
-export const load = async ({ locals }) => {
-	authGuard({ locals, requireAdmin: false });
+export const load = async ({ locals, route }) => {
+	useCombinedAuthGuard({ locals, route });
 	const form = await superValidate(passwordSchema);
 
 	return { form };

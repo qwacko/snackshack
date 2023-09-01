@@ -6,10 +6,10 @@ import { snack, week } from '$lib/server/db/schema/snackSchema.js';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
 import { createWeek } from '$lib/server/actions/createWeek.js';
 import { logging } from '$lib/server/logging.js';
-import { authGuard } from '$lib/server/authGuard.js';
+import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 
-export const load = async ({ url, locals }) => {
-	authGuard({ locals, requireAdmin: true });
+export const load = async ({ locals, route, url }) => {
+	useCombinedAuthGuard({ locals, route });
 
 	const processedParams = validateSearchParams(url, weeksSchema.passthrough().parse);
 

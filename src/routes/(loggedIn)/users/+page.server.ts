@@ -1,8 +1,8 @@
-import { authGuard } from '$lib/server/authGuard.js';
+import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 import { db } from '$lib/server/db/db';
 
-export const load = async ({ locals }) => {
-	authGuard({ locals, requireAdmin: true });
+export const load = async ({ locals, route }) => {
+	useCombinedAuthGuard({ locals, route });
 
 	// Fetch users from database
 	const users = await db.query.user.findMany({

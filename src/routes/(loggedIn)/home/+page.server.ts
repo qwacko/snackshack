@@ -1,10 +1,11 @@
 import { addDays } from '$lib/dateHelper.js';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
-import { authGuard } from '$lib/server/authGuard.js';
+import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 import { db } from '$lib/server/db/db.js';
 import { orderLine, userOrderConfig, week } from '$lib/server/db/schema/snackSchema.js';
 import { user } from '$lib/server/db/schema/userSchema';
 import { logging } from '$lib/server/logging.js';
+import { redirect } from '@sveltejs/kit';
 import { eq, and, lte, gte } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
@@ -146,11 +147,15 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 	};
 };
 
-export const load = async ({ locals }) => {
-	const user = authGuard({ locals, requireAdmin: false });
+export const load = async ({ locals, route }) => {
+	useCombinedAuthGuard({ locals, route });
+
+	if (!locals.user) {
+		throw redirect(302, '/login');
+	}
 
 	return {
-		orderingInfo: getWeekUserInfo({ targetDate: new Date(), userId: user.userId })
+		orderingInfo: getWeekUserInfo({ targetDate: new Date(), userId: locals.user.userId })
 	};
 };
 

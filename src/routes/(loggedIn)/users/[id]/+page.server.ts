@@ -1,14 +1,21 @@
 import { updateNameSchema } from '$lib/schema/updatePasswordSchema copy.js';
 import { updateUserOrderingConfigSchema } from '$lib/schema/userOrderingConfigSchema.js';
-import { authGuard } from '$lib/server/authGuard.js';
+import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 import { db } from '$lib/server/db/db';
 import { user, userOrderConfig } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { setMessage, superValidate } from 'sveltekit-superforms/server';
 
-export const load = async ({ parent, locals }) => {
-	authGuard({ locals, requireAdmin: false });
+export const load = async ({ locals, route, parent, params }) => {
+	useCombinedAuthGuard({
+		locals,
+		route,
+		customValidation: (valid) => ({
+			admin: valid.admin || locals.user?.userId === params.id,
+			user: valid.user
+		})
+	});
 	const parentData = await parent();
 	const orderingData = parentData.currentUser.userOrderConfig;
 

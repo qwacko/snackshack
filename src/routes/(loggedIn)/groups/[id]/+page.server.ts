@@ -6,10 +6,10 @@ import { updateGroupSchema } from '$lib/schema/updateGroupSchema';
 import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { authGuard } from '$lib/server/authGuard.js';
+import { useCombinedAuthGuard } from '$lib/server/authGuard';
 
-export const load = async ({ params, locals }) => {
-	authGuard({ locals, requireAdmin: true });
+export const load = async ({ locals, route, params }) => {
+	useCombinedAuthGuard({ locals, route });
 
 	const groupInfo = await db.query.snackGroup.findFirst({
 		where: (snackGroupInt, { eq }) => eq(snackGroupInt.id, params.id)

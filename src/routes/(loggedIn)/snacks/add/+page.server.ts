@@ -6,10 +6,10 @@ import { nanoid } from 'nanoid';
 import { addSnackSchema } from '$lib/schema/addSnackSchema';
 import { logging } from '$lib/server/logging';
 import { redirect } from '@sveltejs/kit';
-import { authGuard } from '$lib/server/authGuard.js';
+import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 
-export const load = async ({ locals }) => {
-	authGuard({ locals, requireAdmin: true });
+export const load = async ({ locals, route }) => {
+	useCombinedAuthGuard({ locals, route });
 
 	return {
 		form: superValidate(addSnackSchema)

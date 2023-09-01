@@ -2,8 +2,8 @@
 	import { enhance } from '$app/forms';
 	import DisplaySnack from '$lib/components/DisplaySnack.svelte';
 	import PageLayout from '$lib/components/PageLayout.svelte';
-	import SnackImage from '$lib/components/SnackImage.svelte';
-	import { Accordion, AccordionItem, Badge, Card, Progressbar } from 'flowbite-svelte';
+
+	import { Accordion, AccordionItem, Badge, Progressbar } from 'flowbite-svelte';
 
 	export let data;
 

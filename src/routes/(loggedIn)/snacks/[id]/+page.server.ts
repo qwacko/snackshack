@@ -8,10 +8,10 @@ import { logging } from '$lib/server/logging.js';
 import { writeFileSync } from 'fs';
 import { nanoid } from 'nanoid';
 import { serverEnv } from '$lib/server/serverEnv.js';
-import { authGuard } from '$lib/server/authGuard';
+import { useCombinedAuthGuard } from '$lib/server/authGuard';
 
-export const load = async ({ params, locals }) => {
-	authGuard({ locals, requireAdmin: true });
+export const load = async ({ locals, route, params }) => {
+	useCombinedAuthGuard({ locals, route });
 	const snack = await db.query.snack.findFirst({
 		where: (snackTable, { eq }) => eq(snackTable.id, params.id),
 		with: {
