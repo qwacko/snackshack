@@ -4,6 +4,7 @@ import { generateDateInformation } from './generateDateInformation';
 import { snack, week, weekOptions } from '$lib/server/db/schema';
 import { nanoid } from 'nanoid';
 import { logging } from '$lib/server/logging';
+import { serverEnv } from '../serverEnv';
 
 export const populateWeek = async ({ weekId, transDB }: { weekId: string; transDB: typeof db }) => {
 	const snacks = await transDB.query.snack.findMany({
@@ -48,7 +49,12 @@ export const populateWeek = async ({ weekId, transDB }: { weekId: string; transD
 };
 
 export const createWeek = async (date: Date, logErrors: boolean = false) => {
-	const dateInformation = await generateDateInformation(date);
+	const dateInformation = await generateDateInformation({
+		targetDate: date,
+		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
+		nowDate: new Date(),
+		orderDay: serverEnv.ORDER_DAY
+	});
 
 	if (!dateInformation.allowWeekCreation) {
 		logErrors && logging.error('createWeek', 'Week creation not allowed (outside of range)');
