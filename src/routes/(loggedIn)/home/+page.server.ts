@@ -1,10 +1,12 @@
-import { addDays } from '$lib/dateHelper.js';
+import { addDays } from '$lib/addDays';
+import { weeksSchema } from '$lib/schema/paramsWeeksSchema';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
 import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 import { db } from '$lib/server/db/db.js';
 import { orderLine, userOrderConfig, week } from '$lib/server/db/schema/snackSchema.js';
 import { user } from '$lib/server/db/schema/userSchema';
 import { logging } from '$lib/server/logging.js';
+import { validateSearchParams } from '$lib/sveltekitSearchParams';
 import { redirect } from '@sveltejs/kit';
 import { eq, and, lte, gte } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
@@ -18,6 +20,7 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 	});
 
 	if (!userInformation?.userOrderConfig?.enabled) {
+		logging.info("No User Order Config or it's not enabled");
 		return;
 	}
 
@@ -30,7 +33,7 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 
 	if (!userOrderRow) {
 		logging.info('No User Order Config');
-		return;
+		return { dateInformation };
 	}
 
 	const weekInformation = await db.query.week.findFirst({
@@ -51,7 +54,7 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 	});
 
 	if (!weekInformation) {
-		return;
+		return { dateInformation };
 	}
 
 	const totalSpent = weekInformation?.orders.reduce((accumulator, currentValue) => {
@@ -113,7 +116,8 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 			disabled,
 			imageFilename: currentOption.snack.imageFilename,
 			limit: currentOption.snack.maxQuantity,
-			limitReached
+			limitReached,
+			canAdd: dateInformation.canOrder
 		};
 	});
 
@@ -132,7 +136,8 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 				snackPrice: currentOrder.snack.priceCents,
 				snackSpecial: currentOrder.snack.special,
 				snackImageFilename: currentOrder.snack.snack.imageFilename,
-				snackNormalPrice: currentOrder.snack.snack.priceCents
+				snackNormalPrice: currentOrder.snack.snack.priceCents,
+				canRemove: dateInformation.canOrder
 			};
 		})
 		.sort((a, b) => a.snackTitle.localeCompare(b.snackTitle));
@@ -147,15 +152,23 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 	};
 };
 
-export const load = async ({ locals, route }) => {
+export const load = async ({ locals, route, url }) => {
 	useCombinedAuthGuard({ locals, route });
 
 	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
 
+	const processedParams = validateSearchParams(url, weeksSchema.passthrough().parse);
+
+	const data = processedParams;
+
+	const targetDate = new Date(data.date);
+	const targetWeekInfo = await generateDateInformation(targetDate);
+
 	return {
-		orderingInfo: getWeekUserInfo({ targetDate: new Date(), userId: locals.user.userId })
+		orderingInfo: getWeekUserInfo({ targetDate, userId: locals.user.userId }),
+		targetWeekInfo
 	};
 };
 
@@ -192,7 +205,7 @@ export const actions = {
 			userId
 		});
 
-		if (!confirmationInfo) {
+		if (!confirmationInfo?.snackInfo) {
 			logging.info('No Confirmation Info');
 			return;
 		}
@@ -208,6 +221,11 @@ export const actions = {
 
 		if (snackInfo.disabled) {
 			logging.info('Snack Disabled');
+			return;
+		}
+
+		if (!snackInfo.canAdd) {
+			logging.info('Cannot Add To Chosen Week');
 			return;
 		}
 
@@ -247,7 +265,7 @@ export const actions = {
 
 		const orderLineFound = await db.query.orderLine.findFirst({
 			where: eq(orderLine.id, id),
-			with: { userOrderConfig: true }
+			with: { userOrderConfig: true, week: true }
 		});
 
 		if (!orderLineFound) {
@@ -255,8 +273,22 @@ export const actions = {
 			return;
 		}
 
+		if (!orderLineFound.week) {
+			logging.info('No Week Found');
+			return;
+		}
+
 		if (orderLineFound.userOrderConfig.userId !== authUser.userId) {
 			logging.info('Order Line Not For User');
+			return;
+		}
+
+		const dateInformation = await generateDateInformation(
+			addDays(orderLineFound.week.startDate, 3)
+		);
+
+		if (!dateInformation.canOrder) {
+			logging.info('Ordering Closed For The Week');
 			return;
 		}
 

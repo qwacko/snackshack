@@ -2,12 +2,22 @@
 	import { enhance } from '$app/forms';
 	import DisplaySnack from '$lib/components/DisplaySnack.svelte';
 	import PageLayout from '$lib/components/PageLayout.svelte';
+	import { addDays } from '$lib/addDays';
+	import DateNavigator from '$lib/components/DateNavigator.svelte';
+
+	import { weeksSchema } from '$lib/schema/paramsWeeksSchema.js';
+	import { validatedSearchParamsStore } from '$lib/sveltekitSearchParams.js';
 
 	import { Accordion, AccordionItem, Badge, Progressbar } from 'flowbite-svelte';
 
 	export let data;
+	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
 
-	$: spendingInfo = data.orderingInfo
+	$: thisWeek = addDays(new Date(), 0).toISOString().slice(0, 10);
+	$: nextWeek = addDays(data.targetWeekInfo.endDate, 1).toISOString().slice(0, 10);
+	$: prevWeek = addDays(data.targetWeekInfo.startDate, -1).toISOString().slice(0, 10);
+
+	$: spendingInfo = data.orderingInfo?.spendingInfo
 		? {
 				spent: (data.orderingInfo.spendingInfo.totalSpent / 100.0).toFixed(2),
 				totalSpend: (data.orderingInfo.spendingInfo.userSpend / 100.0).toFixed(2),
@@ -18,17 +28,22 @@
 				).toString()
 		  }
 		: undefined;
+
+	$: canOrder = data.orderingInfo?.dateInformation?.canOrder || false;
 </script>
 
 <PageLayout title="Home">
+	<DateNavigator
+		{...data.targetWeekInfo}
+		prevWeekURL={$searchParams.updateSearch({ date: prevWeek })}
+		nextWeekURL={$searchParams.updateSearch({ date: nextWeek })}
+		thisWeekURL={$searchParams.updateSearch({ date: thisWeek })}
+		orderingOpen={canOrder}
+		daysToEnd={data.orderingInfo?.dateInformation?.daysToEndOfOrdering || 0}
+	/>
 	{#if data.orderingInfo}
-		<div class="flex self-center">
-			{data.orderingInfo.dateInformation.startDate.toISOString().slice(0, 10)} - {data.orderingInfo.dateInformation.endDate
-				.toISOString()
-				.slice(0, 10)}
-		</div>
 		<Accordion multiple>
-			{#if spendingInfo}
+			{#if spendingInfo && data.orderingInfo.spendingInfo}
 				<AccordionItem>
 					<div slot="header" class="mr-4 flex w-full flex-row items-center gap-4">
 						<div class="flex whitespace-nowrap">Current Order</div>
@@ -48,7 +63,7 @@
 							{#each data.orderingInfo.currentOrderItems as currentOrder}
 								<form class="flex" action="?/removeSnack" method="POST" use:enhance>
 									<input type="hidden" name="id" value={currentOrder.id} />
-									<button type="submit">
+									<button type="submit" disabled={!canOrder}>
 										<DisplaySnack
 											title={currentOrder.snackTitle}
 											imageFilename={currentOrder.snackImageFilename}
@@ -68,34 +83,36 @@
 				</AccordionItem>
 			{/if}
 
-			{#each data.orderingInfo.groupInfo as currentGroup}
-				{@const groupOptions = data.orderingInfo.snackInfo.filter(
-					(x) => x.groupId === currentGroup.id
-				)}
-				<AccordionItem>
-					<div class="flex flex-row gap-2" slot="header">
-						<div class="flex">{currentGroup.title}</div>
-						{#if currentGroup.limit}
-							<Badge color="red">Limit {currentGroup.limit}</Badge>
-							{#if currentGroup.limitReached}
-								<Badge color="red">Limit Reached</Badge>
+			{#if data.orderingInfo.groupInfo}
+				{#each data.orderingInfo.groupInfo as currentGroup}
+					{@const groupOptions = data.orderingInfo.snackInfo.filter(
+						(x) => x.groupId === currentGroup.id
+					)}
+					<AccordionItem>
+						<div class="flex flex-row gap-2" slot="header">
+							<div class="flex">{currentGroup.title}</div>
+							{#if currentGroup.limit}
+								<Badge color="red">Limit {currentGroup.limit}</Badge>
+								{#if currentGroup.limitReached}
+									<Badge color="red">Limit Reached</Badge>
+								{/if}
 							{/if}
-						{/if}
-					</div>
-					<div class="flex flex-row flex-wrap items-stretch justify-center gap-2">
-						{#each groupOptions as currentOption}
-							<form action="?/addSnack" method="POST" class="flex" use:enhance>
-								<input type="hidden" name="snackId" value={currentOption.id} />
-								<input type="hidden" name="weekId" value={data.orderingInfo.weekId} />
-								<input type="hidden" name="userId" value={data.loggedInUser?.userId} />
-								<button type="submit" disabled={currentOption.disabled}>
-									<DisplaySnack {...currentOption} class="h-full" />
-								</button>
-							</form>
-						{/each}
-					</div>
-				</AccordionItem>
-			{/each}
+						</div>
+						<div class="flex flex-row flex-wrap items-stretch justify-center gap-2">
+							{#each groupOptions as currentOption}
+								<form action="?/addSnack" method="POST" class="flex" use:enhance>
+									<input type="hidden" name="snackId" value={currentOption.id} />
+									<input type="hidden" name="weekId" value={data.orderingInfo.weekId} />
+									<input type="hidden" name="userId" value={data.loggedInUser?.userId} />
+									<button type="submit" disabled={currentOption.disabled || !canOrder}>
+										<DisplaySnack {...currentOption} class="h-full" />
+									</button>
+								</form>
+							{/each}
+						</div>
+					</AccordionItem>
+				{/each}
+			{/if}
 		</Accordion>
 	{/if}
 </PageLayout>

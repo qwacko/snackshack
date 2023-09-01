@@ -1,10 +1,7 @@
-export const addDays = (date: Date, days: number) => {
-	const result = new Date(date);
-	result.setDate(result.getDate() + days);
-	return result;
-};
+import { addDays } from '../addDays';
+import { serverEnv } from './serverEnv';
 
-const firstDayOfWeek = 3;
+const firstDayOfWeek = serverEnv.FIRST_DAY_OF_WEEK;
 
 export const startEndOfWeek = (date: Date) => {
 	const day = date.getDay();
@@ -17,5 +14,6 @@ export const startEndOfWeek = (date: Date) => {
 	startDate.setMilliseconds(0);
 
 	const endDate = addDays(startDate, 7);
+
 	return { startDate, endDate };
 };
