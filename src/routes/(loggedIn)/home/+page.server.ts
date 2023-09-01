@@ -13,6 +13,13 @@ import { eq, and, lte, gte } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
 const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userId: string }) => {
+	const dateInformation = await generateDateInformation({
+		targetDate,
+		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
+		nowDate: new Date(),
+		orderDay: serverEnv.ORDER_DAY
+	});
+
 	const userInformation = await db.query.user.findFirst({
 		where: eq(user.id, userId),
 		with: {
@@ -22,17 +29,11 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 
 	if (!userInformation?.userOrderConfig?.enabled) {
 		logging.info("No User Order Config or it's not enabled");
-		return;
+		return { dateInformation };
 	}
 
 	const userSpend = userInformation?.userOrderConfig.amount;
 
-	const dateInformation = await generateDateInformation({
-		targetDate,
-		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
-		nowDate: new Date(),
-		orderDay: serverEnv.ORDER_DAY
-	});
 	const userOrderRow = await db.query.userOrderConfig.findFirst({
 		where: eq(userOrderConfig.userId, userId)
 	});
