@@ -47,11 +47,11 @@ export const populateWeek = async ({ weekId, transDB }: { weekId: string; transD
 	);
 };
 
-export const createWeek = async (date: Date) => {
+export const createWeek = async (date: Date, logErrors: boolean = false) => {
 	const dateInformation = await generateDateInformation(date);
 
 	if (!dateInformation.allowWeekCreation) {
-		logging.error('createWeek', 'Week creation not allowed (outside of range)');
+		logErrors && logging.error('createWeek', 'Week creation not allowed (outside of range)');
 		return;
 	}
 
@@ -63,7 +63,7 @@ export const createWeek = async (date: Date) => {
 	});
 
 	if (searchWeek) {
-		logging.error('createWeek', 'Week already exists');
+		logErrors && logging.error('createWeek', 'Week already exists');
 		return;
 	}
 
