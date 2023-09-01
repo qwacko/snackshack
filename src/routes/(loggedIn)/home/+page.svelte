@@ -41,7 +41,7 @@
 		orderingOpen={canOrder}
 		daysToEnd={data.orderingInfo?.dateInformation?.daysToEndOfOrdering || 0}
 	/>
-	{#if data.orderingInfo}
+	{#if data.orderingInfo && ((spendingInfo && data.orderingInfo.spendingInfo) || data.orderingInfo.groupInfo)}
 		<Accordion multiple>
 			{#if spendingInfo && data.orderingInfo.spendingInfo}
 				<AccordionItem>
@@ -114,5 +114,7 @@
 				{/each}
 			{/if}
 		</Accordion>
+	{:else}
+		<Badge color="red">No ordering information available</Badge>
 	{/if}
 </PageLayout>
