@@ -6,13 +6,17 @@ services:
     image: ghcr.io/qwacko/snackshack:master
     environment:
       - DATABASE_FILE=/app/db/db.db
+      - UPLOAD_DIR=/app/uploads
+      - BACKUP_DIR=/app/backups
       - ORIGIN=https://www.example.com
       - PORT=3000
       - ALLOW_SIGNUP=false
-      - FIRST_DAY_OF_WEEK="SUNDAY"
-      - ORDER_DAY="SUNDAY"
+      - FIRST_DAY_OF_WEEK=SUNDAY
+      - ORDER_DAY=SUNDAY
     volumes:
       - ./db/:/app/db
+      - ./uploads/:/app/uploads
+      - ./backups/:/app/backups
     ports:
       - 3000:3000
     restart: unless-stopped
