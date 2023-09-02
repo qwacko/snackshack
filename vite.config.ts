@@ -13,8 +13,8 @@ export default defineConfig(({ mode }) => {
 			SvelteKitPWA({
 				mode: mode === 'development' ? 'development' : 'production',
 				manifest: {
-					short_name: 'SK PWA',
-					name: 'sveltekit-lucia-starter PWA',
+					short_name: 'Snack Shack',
+					name: 'Snack Shack',
 					start_url: '/',
 					scope: '/',
 					display: 'standalone',

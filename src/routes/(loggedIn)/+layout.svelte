@@ -9,6 +9,7 @@
 	import UsersIcon from '$lib/components/icons/UsersIcon.svelte';
 	import WeeksIcon from '$lib/components/icons/WeeksIcon.svelte';
 	import { Button, Tooltip } from 'flowbite-svelte';
+	import BiscuitIcon from '~icons/mdi/biscuit-outline';
 
 	export let data;
 
@@ -30,7 +31,10 @@
 <div class="flex w-full flex-col items-center">
 	<div class="flex w-full max-w-5xl flex-col gap-2">
 		<div class="m-x-10 m-y-4 flex w-full flex-row items-center justify-center gap-2 p-4">
-			<h1 class="flex flex-grow basis-0 text-2xl">Snack Shack</h1>
+			<div class="flex flex-grow basis-0">
+				<img src="/completelogo.svg" alt="SnackShack Logo" class="h-" />
+			</div>
+
 			<Button id="homeLink" href="/home" color={homePage ? 'primary' : 'none'} class="p-3">
 				<HomeIcon />
 				<Tooltip triggeredBy="[id=homeLink]" type="light">Home</Tooltip>
