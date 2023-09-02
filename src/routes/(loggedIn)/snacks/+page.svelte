@@ -22,7 +22,7 @@
 				{/if}
 			</div>
 
-			<div class="flex grid-cols-10 gap-2">
+			<div class="flex grid-cols-10 flex-wrap items-stretch justify-center gap-2">
 				{#each snacksInGroup as snack}
 					{@const snackLimit = snack.maxQuantity ? snack.maxQuantity : undefined}
 					{@const disabled = !snack.enabled || snack.priceCents === 0}

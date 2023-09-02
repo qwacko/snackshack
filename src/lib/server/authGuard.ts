@@ -106,6 +106,7 @@ export const useCombinedAuthGuard = combinedAuthGuard(
 		'/(loggedIn)/snacks/images': adminOnlyConfig,
 
 		'/(loggedIn)/weeks': adminOnlyConfig,
+		'/(loggedIn)/weeks/[id]/recreate': adminOnlyConfig,
 
 		'/(loggedOut)/login': loggedOutConfig,
 		'/(loggedOut)/signup': loggedOutConfig,
