@@ -22,10 +22,10 @@
 			<Badge color="yellow">
 				<div class="flex flex-row gap-1">
 					<div class="flex line-through">
-						${(specialPrice / 100.0).toFixed(2)}
+						${(normalPrice / 100.0).toFixed(2)}
 					</div>
 					<div class="flex">
-						${(normalPrice / 100.0).toFixed(2)}
+						${(specialPrice / 100.0).toFixed(2)}
 					</div>
 				</div>
 			</Badge>

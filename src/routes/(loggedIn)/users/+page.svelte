@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PageLayout from '$lib/components/PageLayout.svelte';
+	import SnackArrangement from '$lib/components/SnackArrangement.svelte';
 	import { Badge, Button, Card } from 'flowbite-svelte';
 
 	export let data;
@@ -11,7 +12,7 @@
 	{#if userIsAdmin}
 		<Button class="self-center" href="/users/create" outline>Create User</Button>
 	{/if}
-	<div class="flex w-full grid-cols-6 justify-center gap-4">
+	<SnackArrangement>
 		{#each data.users as currentUser}
 			<Card href="/users/{currentUser.id}">
 				<div class="flex flex-col items-center gap-2">
@@ -30,5 +31,5 @@
 				</div>
 			</Card>
 		{/each}
-	</div>
+	</SnackArrangement>
 </PageLayout>
