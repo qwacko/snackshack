@@ -9,6 +9,7 @@
 	import { validatedSearchParamsStore } from '$lib/sveltekitSearchParams.js';
 
 	import { Accordion, AccordionItem, Badge, Progressbar } from 'flowbite-svelte';
+	import SnackArrangement from '$lib/components/SnackArrangement.svelte';
 
 	export let data;
 	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
@@ -59,7 +60,7 @@
 							</div>
 						</div>
 
-						<div class="flex flex-row flex-wrap justify-center gap-2 self-center">
+						<SnackArrangement>
 							{#each data.orderingInfo.currentOrderItems as currentOrder}
 								<form class="flex" action="?/removeSnack" method="POST" use:enhance>
 									<input type="hidden" name="id" value={currentOrder.id} />
@@ -78,7 +79,7 @@
 									</button>
 								</form>
 							{/each}
-						</div>
+						</SnackArrangement>
 					</div>
 				</AccordionItem>
 			{/if}
@@ -98,7 +99,7 @@
 								{/if}
 							{/if}
 						</div>
-						<div class="flex flex-row flex-wrap items-stretch justify-center gap-2">
+						<SnackArrangement>
 							{#each groupOptions as currentOption}
 								<form action="?/addSnack" method="POST" class="flex" use:enhance>
 									<input type="hidden" name="snackId" value={currentOption.id} />
@@ -109,7 +110,7 @@
 									</button>
 								</form>
 							{/each}
-						</div>
+						</SnackArrangement>
 					</AccordionItem>
 				{/each}
 			{/if}

@@ -7,6 +7,7 @@
 	import { enhance } from '$app/forms';
 	import DisplaySnack from '$lib/components/DisplaySnack.svelte';
 	import DateNavigator from '$lib/components/DateNavigator.svelte';
+	import SnackArrangement from '$lib/components/SnackArrangement.svelte';
 
 	export let data;
 
@@ -46,7 +47,7 @@
 			<Accordion class="w-full">
 				<AccordionItem>
 					<div slot="header">On Sale</div>
-					<div class="flex flex-row items-stretch justify-center gap-2">
+					<SnackArrangement>
 						{#each data.weekData.options.filter((opt) => opt.special) as currentOption}
 							<DisplaySnack
 								limit={currentOption.snack.maxQuantity}
@@ -58,11 +59,11 @@
 								disabled={false}
 							/>
 						{/each}
-					</div>
+					</SnackArrangement>
 				</AccordionItem>
 				<AccordionItem>
 					<div slot="header">Normal Price</div>
-					<div class="flex flex-row items-stretch justify-center gap-2">
+					<SnackArrangement>
 						{#each data.weekData.options.filter((opt) => !opt.special) as currentOption}
 							<DisplaySnack
 								limit={currentOption.snack.maxQuantity}
@@ -74,11 +75,11 @@
 								disabled={false}
 							/>
 						{/each}
-					</div>
+					</SnackArrangement>
 				</AccordionItem>
 				<AccordionItem>
 					<div slot="header">Excluded Snacks</div>
-					<div class="flex flex-row items-stretch justify-center gap-2">
+					<SnackArrangement>
 						{#if data.excludedSnacks}
 							{#each data.excludedSnacks as currentOption}
 								<DisplaySnack
@@ -92,7 +93,7 @@
 								/>
 							{/each}
 						{/if}
-					</div>
+					</SnackArrangement>
 				</AccordionItem>
 				{#if data.usersWithOrder}
 					{#each data.usersWithOrder as currentUser}
@@ -107,7 +108,7 @@
 							<div slot="header">
 								{currentUser.name} Order - ${(userSpend / 100.0).toFixed(2)}
 							</div>
-							<div class="flex flex-row items-stretch justify-center gap-2">
+							<SnackArrangement>
 								{#each userOrderItems as currentOrderItem}
 									<DisplaySnack
 										disabled={false}
@@ -119,7 +120,7 @@
 										title={currentOrderItem.snack.snack.title}
 									/>
 								{/each}
-							</div>
+							</SnackArrangement>
 						</AccordionItem>
 					{/each}
 				{/if}
