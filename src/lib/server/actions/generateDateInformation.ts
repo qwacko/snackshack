@@ -1,6 +1,12 @@
 import { startEndOfWeek } from '$lib/server/dateHelper.js';
 import { addDays } from '$lib/addDays';
 
+const differenceBetweenDates = (date1: Date, date2: Date) => {
+	const diffTime = date2.getTime() - date1.getTime();
+	const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+	return diffDays;
+};
+
 export const generateDateInformation = async ({
 	targetDate,
 	nowDate,
@@ -18,14 +24,23 @@ export const generateDateInformation = async ({
 	const { endDate, startDate } = startEndOfWeek(targetDate, firstDayOfWeek);
 	const isThisWeek = nowDate < endDate && nowDate >= startDate;
 	const isNextWeek = nowDate < addDays(endDate, -7) && nowDate >= addDays(startDate, -7);
-	const orderingStart = addDays(startDate, -daysBeforeEndToOrder + 7);
-	const orderingEnd = addDays(endDate, -daysBeforeEndToOrder + 7);
-	const canOrder = nowDate < orderingEnd && nowDate >= orderingStart;
-	const daysToEndOfOrdering = orderingEnd.getDate() - nowDate.getDate();
+
+	const orderingEnd = addDays(startDate, -daysBeforeEndToOrder);
+	const daysToEndOfOrdering = differenceBetweenDates(nowDate, orderingEnd);
+	const canOrder = daysToEndOfOrdering > 0 && daysToEndOfOrdering <= 14;
 	const showNextWeek = endDate < addDays(nowDate, 7);
 	const midWeek = addDays(startDate, 3);
 
 	const allowWeekCreation = daysToEndOfOrdering >= 7;
+
+	console.log('generateDateInformation', {
+		startDate,
+		endDate,
+		orderingEnd,
+		canOrder,
+		nowDate,
+		daysToEndOfOrdering
+	});
 
 	return {
 		startDate,
