@@ -40,6 +40,9 @@
 		{/if}
 	{:else}
 		<div class="flex w-full flex-col items-center gap-4">
+			{#if data.targetWeekInfo.allowWeekCreation}
+				<Button href="/weeks/{data.weekData.id}/recreate" outline>Reset Week</Button>
+			{/if}
 			<Accordion class="w-full">
 				<AccordionItem>
 					<div slot="header">On Sale</div>

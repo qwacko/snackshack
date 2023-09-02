@@ -31,7 +31,7 @@ export const generateDateInformation = async ({
 	const showNextWeek = endDate < addDays(nowDate, 7);
 	const midWeek = addDays(startDate, 3);
 
-	const allowWeekCreation = daysToEndOfOrdering >= 7;
+	const allowWeekCreation = daysToEndOfOrdering >= 0;
 
 	false &&
 		console.log('generateDateInformation', {
