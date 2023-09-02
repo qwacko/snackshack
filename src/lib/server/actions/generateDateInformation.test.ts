@@ -32,7 +32,7 @@ describe('Date Generation', () => {
 		expect(data.daysToEndOfOrdering).toBe(-3);
 		expect(data.canOrder).toBe(false);
 	});
-	it('Test 03 : Current day is a week from week start, and order day is different.', async () => {
+	it('Test 04 : Current day is a week from week start, and order day is different.', async () => {
 		const data = await generateDateInformation({
 			targetDate: new Date('2023-09-09T10:00:00.000Z'),
 			firstDayOfWeek: 6,
@@ -42,7 +42,7 @@ describe('Date Generation', () => {
 		expect(data.daysToEndOfOrdering).toBe(4);
 		expect(data.canOrder).toBe(true);
 	});
-	it('Test 04 : Date is start of the week, ordering date is earlier', async () => {
+	it('Test 05 : Date is start of the week, ordering date is earlier', async () => {
 		const data = await generateDateInformation({
 			targetDate: new Date('2023-09-09T10:00:00.000Z'),
 			firstDayOfWeek: 0,
@@ -52,7 +52,7 @@ describe('Date Generation', () => {
 		expect(data.daysToEndOfOrdering).toBe(-6);
 		expect(data.canOrder).toBe(false);
 	});
-	it('Test 05 : Long Time Until Ordering', async () => {
+	it('Test 06 : Long Time Until Ordering', async () => {
 		const data = await generateDateInformation({
 			targetDate: new Date('2023-09-02T10:00:00.000Z'),
 			firstDayOfWeek: 0,

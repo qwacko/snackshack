@@ -33,14 +33,15 @@ export const generateDateInformation = async ({
 
 	const allowWeekCreation = daysToEndOfOrdering >= 7;
 
-	console.log('generateDateInformation', {
-		startDate,
-		endDate,
-		orderingEnd,
-		canOrder,
-		nowDate,
-		daysToEndOfOrdering
-	});
+	false &&
+		console.log('generateDateInformation', {
+			startDate,
+			endDate,
+			orderingEnd,
+			canOrder,
+			nowDate,
+			daysToEndOfOrdering
+		});
 
 	return {
 		startDate,
