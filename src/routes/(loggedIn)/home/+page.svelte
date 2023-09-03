@@ -14,9 +14,9 @@
 	export let data;
 	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
 
-	$: thisWeek = addDays(new Date(), 0).toISOString().slice(0, 10);
-	$: nextWeek = addDays(data.targetWeekInfo.endDate, 1).toISOString().slice(0, 10);
-	$: prevWeek = addDays(data.targetWeekInfo.startDate, -1).toISOString().slice(0, 10);
+	$: thisPeriod = data.orderingInfo.dateInformation.midPeriod.toISOString().slice(0, 10);
+	$: nextPeriod = data.orderingInfo.dateInformation.nextPeriodMid.toISOString().slice(0, 10);
+	$: prevPeriod = data.orderingInfo.dateInformation.prevPeriodMid.toISOString().slice(0, 10);
 
 	$: spendingInfo = data.orderingInfo?.spendingInfo
 		? {
@@ -35,10 +35,10 @@
 
 <PageLayout title="Home">
 	<DateNavigator
-		{...data.targetWeekInfo}
-		prevWeekURL={$searchParams.updateSearch({ date: prevWeek })}
-		nextWeekURL={$searchParams.updateSearch({ date: nextWeek })}
-		thisWeekURL={$searchParams.updateSearch({ date: thisWeek })}
+		{...data.orderingInfo.dateInformation}
+		prevPeriodURL={$searchParams.updateSearch({ date: prevPeriod })}
+		nextPeriodURL={$searchParams.updateSearch({ date: nextPeriod })}
+		thisPeriodURL={$searchParams.updateSearch({ date: thisPeriod })}
 		orderingOpen={canOrder}
 		daysToEnd={data.orderingInfo?.dateInformation?.daysToEndOfOrdering || 0}
 	/>
@@ -103,7 +103,7 @@
 							{#each groupOptions as currentOption}
 								<form action="?/addSnack" method="POST" class="flex" use:enhance>
 									<input type="hidden" name="snackId" value={currentOption.id} />
-									<input type="hidden" name="weekId" value={data.orderingInfo.weekId} />
+									<input type="hidden" name="weekId" value={data.orderingInfo.periodId} />
 									<input type="hidden" name="userId" value={data.loggedInUser?.userId} />
 									<button type="submit" disabled={currentOption.disabled || !canOrder}>
 										<DisplaySnack {...currentOption} class="h-full" />

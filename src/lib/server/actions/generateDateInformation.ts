@@ -1,5 +1,6 @@
-import { startEndOfWeek } from '$lib/server/dateHelper.js';
+import { dateHelper } from '$lib/server/dateHelper.js';
 import { addDays } from '$lib/addDays';
+import type { SERVER_ENV_TYPE } from '../serverEnv';
 
 const differenceBetweenDates = (date1: Date, date2: Date) => {
 	const diffTime = date2.getTime() - date1.getTime();
@@ -8,32 +9,40 @@ const differenceBetweenDates = (date1: Date, date2: Date) => {
 };
 
 export const generateDateInformation = async ({
+	frequency,
 	targetDate,
+	startDay,
+	orderLead,
+	daysToAllowOrdering,
 	nowDate,
-	orderDay,
-	firstDayOfWeek
+	log = false
 }: {
 	targetDate: Date;
 	nowDate: Date;
-	orderDay: number;
-	firstDayOfWeek: number;
+	frequency: SERVER_ENV_TYPE['FREQUENCY'];
+	startDay: SERVER_ENV_TYPE['START_DAY'];
+	orderLead: SERVER_ENV_TYPE['ORDER_LEAD'];
+	daysToAllowOrdering: SERVER_ENV_TYPE['DAYS_TO_ALLOW_ORDERING'];
+	log?: boolean;
 }) => {
-	const daysBeforeEndToOrder =
-		orderDay <= firstDayOfWeek ? firstDayOfWeek - orderDay : 7 - (orderDay - firstDayOfWeek);
-
-	const { endDate, startDate } = startEndOfWeek(targetDate, firstDayOfWeek);
-	const isThisWeek = nowDate < endDate && nowDate >= startDate;
-	const isNextWeek = nowDate < addDays(endDate, -7) && nowDate >= addDays(startDate, -7);
-
-	const orderingEnd = addDays(startDate, -daysBeforeEndToOrder);
+	const { endDate, startDate } = dateHelper({
+		frequency,
+		startDay,
+		inputDate: targetDate
+	});
+	const isCurrent = nowDate < endDate && nowDate >= startDate;
+	const orderingEnd = addDays(startDate, -orderLead);
 	const daysToEndOfOrdering = differenceBetweenDates(nowDate, orderingEnd);
-	const canOrder = daysToEndOfOrdering > 0 && daysToEndOfOrdering <= 14;
-	const showNextWeek = endDate < addDays(nowDate, 7);
-	const midWeek = addDays(startDate, 3);
+	const canOrder = daysToEndOfOrdering > 0 && daysToEndOfOrdering <= daysToAllowOrdering;
+	const midPeriod = addDays(new Date(startDate), frequency === 'MONTHLY' ? 15 : 3);
 
-	const allowWeekCreation = daysToEndOfOrdering >= 0;
+	const nextPeriodMid = addDays(midPeriod, frequency === 'MONTHLY' ? 30 : 7);
+	const prevPeriodMid = addDays(midPeriod, frequency === 'MONTHLY' ? -30 : -7);
 
-	false &&
+	const allowWeekCreation = canOrder;
+	const showNextPeriod = true;
+
+	log &&
 		console.log('generateDateInformation', {
 			startDate,
 			endDate,
@@ -46,12 +55,13 @@ export const generateDateInformation = async ({
 	return {
 		startDate,
 		endDate,
-		isThisWeek,
-		isNextWeek,
+		isCurrent,
 		canOrder,
-		showNextWeek,
-		midWeek,
+		midPeriod,
 		daysToEndOfOrdering,
-		allowWeekCreation
+		allowWeekCreation,
+		nextPeriodMid,
+		prevPeriodMid,
+		showNextPeriod
 	};
 };

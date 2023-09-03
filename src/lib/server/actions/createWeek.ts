@@ -6,7 +6,13 @@ import { nanoid } from 'nanoid';
 import { logging } from '$lib/server/logging';
 import { serverEnv } from '../serverEnv';
 
-export const populateWeek = async ({ weekId, transDB }: { weekId: string; transDB: typeof db }) => {
+export const populatePeriod = async ({
+	weekId,
+	transDB
+}: {
+	weekId: string;
+	transDB: typeof db;
+}) => {
 	const snacks = await transDB.query.snack.findMany({
 		where: and(eq(snack.enabled, true), gt(snack.priceCents, 0)),
 		with: { snackGroup: true }
@@ -48,12 +54,14 @@ export const populateWeek = async ({ weekId, transDB }: { weekId: string; transD
 	);
 };
 
-export const createWeek = async (date: Date, logErrors: boolean = false) => {
+export const createPeriod = async (date: Date, logErrors: boolean = false) => {
 	const dateInformation = await generateDateInformation({
 		targetDate: date,
-		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
-		nowDate: new Date(),
-		orderDay: serverEnv.ORDER_DAY
+		frequency: serverEnv.FREQUENCY,
+		startDay: serverEnv.START_DAY,
+		daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
+		orderLead: serverEnv.ORDER_LEAD,
+		nowDate: new Date()
 	});
 
 	if (!dateInformation.allowWeekCreation) {
@@ -61,15 +69,15 @@ export const createWeek = async (date: Date, logErrors: boolean = false) => {
 		return;
 	}
 
-	const searchWeek = await db.query.week.findFirst({
+	const searchPeriod = await db.query.week.findFirst({
 		where: and(
-			lte(week.startDate, dateInformation.midWeek),
-			gte(week.endDate, dateInformation.midWeek)
+			lte(week.startDate, dateInformation.midPeriod),
+			gte(week.endDate, dateInformation.midPeriod)
 		)
 	});
 
-	if (searchWeek) {
-		logErrors && logging.error('createWeek', 'Week already exists');
+	if (searchPeriod) {
+		logErrors && logging.error('createPeriod', 'Period already exists');
 		return;
 	}
 
@@ -85,8 +93,8 @@ export const createWeek = async (date: Date, logErrors: boolean = false) => {
 
 		const createdWeek = await dbTrans.query.week.findFirst({
 			where: and(
-				lte(week.startDate, dateInformation.midWeek),
-				gte(week.endDate, dateInformation.midWeek)
+				lte(week.startDate, dateInformation.midPeriod),
+				gte(week.endDate, dateInformation.midPeriod)
 			)
 		});
 
@@ -95,8 +103,8 @@ export const createWeek = async (date: Date, logErrors: boolean = false) => {
 			return;
 		}
 
-		await populateWeek({ weekId: createdWeek.id, transDB: dbTrans });
+		await populatePeriod({ weekId: createdWeek.id, transDB: dbTrans });
 
-		logging.info('New Week Created', createdWeek);
+		logging.info('New Period Created', createdWeek);
 	});
 };

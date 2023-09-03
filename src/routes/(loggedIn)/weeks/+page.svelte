@@ -13,17 +13,17 @@
 
 	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
 
-	$: thisWeek = addDays(new Date(), 0).toISOString().slice(0, 10);
-	$: nextWeek = addDays(data.targetWeekInfo.endDate, 1).toISOString().slice(0, 10);
-	$: prevWeek = addDays(data.targetWeekInfo.startDate, -1).toISOString().slice(0, 10);
+	$: thisWeek = data.targetWeekInfo.midPeriod.toISOString().slice(0, 10);
+	$: nextWeek = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
+	$: prevWeek = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
 </script>
 
 <PageLayout title="Weeks" size="lg">
 	<DateNavigator
 		{...data.targetWeekInfo}
-		prevWeekURL={$searchParams.updateSearch({ date: prevWeek })}
-		nextWeekURL={$searchParams.updateSearch({ date: nextWeek })}
-		thisWeekURL={$searchParams.updateSearch({ date: thisWeek })}
+		prevPeriodURL={$searchParams.updateSearch({ date: prevWeek })}
+		nextPeriodURL={$searchParams.updateSearch({ date: nextWeek })}
+		thisPeriodURL={$searchParams.updateSearch({ date: thisWeek })}
 		orderingOpen={data.targetWeekInfo.canOrder}
 		daysToEnd={data.targetWeekInfo.daysToEndOfOrdering}
 	/>

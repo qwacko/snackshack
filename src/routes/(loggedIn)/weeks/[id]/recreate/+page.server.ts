@@ -1,5 +1,5 @@
 import { addDays } from '$lib/addDays.js';
-import { createWeek } from '$lib/server/actions/createWeek';
+import { createPeriod } from '$lib/server/actions/createWeek';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
 import { useCombinedAuthGuard } from '$lib/server/authGuard';
 import { db } from '$lib/server/db/db';
@@ -29,9 +29,11 @@ export const load = async ({ locals, route, params }) => {
 
 	const dateInformation = await generateDateInformation({
 		targetDate: startDate,
-		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
-		nowDate: new Date(),
-		orderDay: serverEnv.ORDER_DAY
+		frequency: serverEnv.FREQUENCY,
+		startDay: serverEnv.START_DAY,
+		orderLead: serverEnv.ORDER_LEAD,
+		daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
+		nowDate: new Date()
 	});
 
 	if (!dateInformation.allowWeekCreation) {
@@ -62,7 +64,7 @@ export const actions = {
 		db.delete(weekOptions).where(eq(weekOptions.weekId, targetWeek.id)).run();
 		db.delete(week).where(eq(week.id, targetWeek.id)).run();
 
-		await createWeek(addDays(targetWeek.startDate, 2));
+		await createPeriod(addDays(targetWeek.startDate, 2));
 
 		throw redirect(302, `/weeks?date=${targetWeek.startDate.toISOString().slice(0, 10)}`);
 	}

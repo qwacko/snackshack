@@ -4,7 +4,7 @@ import { validateSearchParams } from '$lib/sveltekitSearchParams';
 import { and, gte, lte, notInArray } from 'drizzle-orm';
 import { snack, week } from '$lib/server/db/schema/snackSchema.js';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
-import { createWeek } from '$lib/server/actions/createWeek.js';
+import { createPeriod } from '$lib/server/actions/createWeek.js';
 import { logging } from '$lib/server/logging.js';
 import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 import { serverEnv } from '$lib/server/serverEnv.js';
@@ -19,15 +19,17 @@ export const load = async ({ locals, route, url }) => {
 	const targetDate = new Date(data.date);
 	const targetWeekInfo = await generateDateInformation({
 		targetDate: targetDate,
-		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
-		nowDate: new Date(),
-		orderDay: serverEnv.ORDER_DAY
+		frequency: serverEnv.FREQUENCY,
+		daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
+		orderLead: serverEnv.ORDER_LEAD,
+		startDay: serverEnv.START_DAY,
+		nowDate: new Date()
 	});
 
 	const weekData = await db.query.week.findFirst({
 		where: and(
-			lte(week.startDate, targetWeekInfo.midWeek),
-			gte(week.endDate, targetWeekInfo.midWeek)
+			lte(week.startDate, targetWeekInfo.midPeriod),
+			gte(week.endDate, targetWeekInfo.midPeriod)
 		),
 		with: {
 			options: { with: { snack: true } },
@@ -87,6 +89,6 @@ export const actions = {
 
 		const targetDate = new Date(targetDateString.toString());
 
-		await createWeek(targetDate);
+		await createPeriod(targetDate);
 	}
 };

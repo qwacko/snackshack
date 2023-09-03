@@ -5,7 +5,7 @@ import { logging } from '../logging';
 import { serverEnv } from '../serverEnv';
 import type { CronJob } from './cron';
 import { week } from '../db/schema';
-import { createWeek } from '../actions/createWeek';
+import { createPeriod } from '../actions/createWeek';
 
 export const cronJobs: CronJob[] = [
 	{
@@ -25,7 +25,7 @@ export const cronJobs: CronJob[] = [
 
 			const weekCountStart = await db.select({ count: sql<number>`count(*)` }).from(week);
 
-			await Promise.all([createWeek(nowDate), createWeek(prevWeek), createWeek(nextWeek)]);
+			await Promise.all([createPeriod(nowDate), createPeriod(prevWeek), createPeriod(nextWeek)]);
 
 			const weekCountEnd = await db.select({ count: sql<number>`count(*)` }).from(week);
 
