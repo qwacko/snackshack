@@ -22,34 +22,5 @@
       "when": 1693258726877,
       "tag": "0002_sloppy_gertrude_yorkes",
       "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1693791587203,
-      "tag": "0003_cultured_sharon_carter",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1693791695052,
-      "tag": "0004_clammy_midnight",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1693791715749,
-      "tag": "0005_unusual_the_anarchist",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1693791749731,
-      "tag": "0006_milky_red_skull",
-      "breakpoints": true
     }
-  ]
 }
