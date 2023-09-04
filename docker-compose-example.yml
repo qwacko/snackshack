@@ -11,8 +11,10 @@ services:
       - ORIGIN=https://www.example.com
       - PORT=3000
       - ALLOW_SIGNUP=false
-      - FIRST_DAY_OF_WEEK=SUNDAY
-      - ORDER_DAY=SUNDAY
+      - FREQUENCY=WEEKLY
+      - START_DAY=0
+      - ORDER_LEAD=2
+      - DAYS_TO_ALLOW_ORDERING=7
     volumes:
       - ./db/:/app/db
       - ./uploads/:/app/uploads

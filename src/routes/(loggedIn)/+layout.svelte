@@ -7,9 +7,8 @@
 	import SnacksIcon from '$lib/components/icons/SnacksIcon.svelte';
 	import UserIcon from '$lib/components/icons/UserIcon.svelte';
 	import UsersIcon from '$lib/components/icons/UsersIcon.svelte';
-	import WeeksIcon from '$lib/components/icons/WeeksIcon.svelte';
+	import CalendarIcon from '$lib/components/icons/CalendarIcon.svelte';
 	import { Button, Tooltip } from 'flowbite-svelte';
-	import BiscuitIcon from '~icons/mdi/biscuit-outline';
 
 	export let data;
 
@@ -22,7 +21,7 @@
 	$: usersPage = activeUrl.startsWith('/users') && !userPage;
 	$: snacksPage = activeUrl.startsWith('/snacks');
 	$: groupsPage = activeUrl.startsWith('/groups');
-	$: weeksPage = activeUrl.startsWith('/weeks');
+	$: periodsPage = activeUrl.startsWith('/orderingPeriods');
 	$: homePage = activeUrl === '/home';
 	$: backupPage = activeUrl === '/backup';
 	$: logoutPage = activeUrl === '/signout';
@@ -44,9 +43,16 @@
 					<UsersIcon />
 					<Tooltip triggeredBy="[id=usersLink]" type="light">Users</Tooltip>
 				</Button>
-				<Button id="weeksLink" href="/weeks" color={weeksPage ? 'primary' : 'none'} class="p-3">
-					<WeeksIcon />
-					<Tooltip triggeredBy="[id=weeksLink]" type="light">Weeks</Tooltip>
+				<Button
+					id="orderingPeriodsLink"
+					href="/orderingPeriods"
+					color={periodsPage ? 'primary' : 'none'}
+					class="p-3"
+				>
+					<CalendarIcon />
+					<Tooltip triggeredBy="[id=orderingPeriodsLink]" type="light"
+						>{data.orderingTexts.plural}</Tooltip
+					>
 				</Button>
 
 				<Button id="snacksLink" href="/snacks" color={snacksPage ? 'primary' : 'none'} class="p-3">

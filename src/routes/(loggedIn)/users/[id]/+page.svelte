@@ -69,7 +69,8 @@
 				<h5 class="text-md flex flex-row gap-1">Name : <b>{data.currentUser.name}</b></h5>
 				{#if data.currentUser.userOrderConfig?.enabled}
 					<h5 class="text-md flex flex-row gap-1">
-						Weekly Spend : <b>${(data.currentUser.userOrderConfig.amount / 100.0).toFixed(2)}</b>
+						{data.orderingTexts.perUnit} Spend :
+						<b>${(data.currentUser.userOrderConfig.amount / 100.0).toFixed(2)}</b>
 					</h5>
 				{/if}
 			{/if}
