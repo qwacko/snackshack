@@ -7,7 +7,7 @@ import { generateDateInformation } from '$lib/server/actions/generateDateInforma
 import { createPeriod } from '$lib/server/actions/createWeek.js';
 import { logging } from '$lib/server/logging.js';
 import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
-import { serverEnv } from '$lib/server/serverEnv.js';
+import { serverEnv, type SERVER_ENV_TYPE } from '$lib/server/serverEnv.js';
 
 export const load = async ({ locals, route, url }) => {
 	useCombinedAuthGuard({ locals, route });
@@ -23,7 +23,8 @@ export const load = async ({ locals, route, url }) => {
 		daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
 		orderLead: serverEnv.ORDER_LEAD,
 		startDay: serverEnv.START_DAY,
-		nowDate: new Date()
+		nowDate: new Date(),
+		log: false
 	});
 
 	const weekData = await db.query.week.findFirst({
@@ -78,12 +79,12 @@ export const load = async ({ locals, route, url }) => {
 };
 
 export const actions = {
-	createWeek: async ({ request }) => {
+	createPeriod: async ({ request }) => {
 		const form = await request.formData();
 		const targetDateString = form.get('date');
 
 		if (!targetDateString) {
-			logging.error('createWeek Action', 'No date provided');
+			logging.error('createPeriod Action', 'No date provided');
 			return;
 		}
 

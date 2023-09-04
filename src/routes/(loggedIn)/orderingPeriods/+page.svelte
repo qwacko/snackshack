@@ -14,10 +14,10 @@
 
 	$: thisPeriod = new Date().toISOString().slice(0, 10);
 	$: nextPeriod = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
-	$: prevPeriod = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
+	$: prevPeriod = data.targetWeekInfo.prevPeriodMid.toISOString().slice(0, 10);
 </script>
 
-<PageLayout title="Weeks" size="lg">
+<PageLayout title={data.orderingTexts.plural} size="lg">
 	<DateNavigator
 		{...data.targetWeekInfo}
 		prevPeriodURL={$searchParams.updateSearch({ date: prevPeriod })}
@@ -27,13 +27,15 @@
 		daysToEnd={data.targetWeekInfo.daysToEndOfOrdering}
 	/>
 	{#if !data.weekData}
-		<div class="flex self-center"><Alert color="red">No Data For This Period Yet</Alert></div>
+		<div class="flex self-center">
+			<Alert color="red">No Data For This {data.orderingTexts.singleLower} Yet</Alert>
+		</div>
 		{#if data.loggedInUser?.admin}
 			{#if data.targetWeekInfo.allowWeekCreation}
 				<div class="flex self-center">
-					<form action="?/createWeek" method="POST" use:enhance>
+					<form action="?/createPeriod" method="POST" use:enhance>
 						<input type="hidden" name="date" value={$searchParams.value.date} />
-						<Button type="submit" outline>Create Week</Button>
+						<Button type="submit" outline>Create {data.orderingTexts.single}</Button>
 					</form>
 				</div>
 			{/if}
@@ -41,7 +43,9 @@
 	{:else}
 		<div class="flex w-full flex-col items-center gap-4">
 			{#if data.targetWeekInfo.allowWeekCreation}
-				<Button href="/weeks/{data.weekData.id}/recreate" outline>Reset Week</Button>
+				<Button href="/weeks/{data.weekData.id}/recreate" outline
+					>Reset {data.orderingTexts.single}</Button
+				>
 			{/if}
 			<Accordion class="w-full">
 				<AccordionItem>
