@@ -33,6 +33,7 @@ export const generateDateInformation = async ({
 	const isCurrent = nowDate < endDate && nowDate >= startDate;
 	const orderingEnd = addDays(startDate, -orderLead);
 	const daysToEndOfOrdering = differenceBetweenDates(nowDate, orderingEnd);
+
 	const canOrder = daysToEndOfOrdering > 0 && daysToEndOfOrdering <= daysToAllowOrdering;
 	const midPeriod = addDays(new Date(startDate), frequency === 'MONTHLY' ? 15 : 3);
 
@@ -40,7 +41,9 @@ export const generateDateInformation = async ({
 	const prevPeriodMid = addDays(midPeriod, frequency === 'MONTHLY' ? -30 : -7);
 
 	const allowWeekCreation = canOrder;
-	const showNextPeriod = true;
+
+	const daysToEndOfNextOrdering = differenceBetweenDates(nowDate, addDays(endDate, -orderLead));
+	const showNextPeriod = daysToEndOfNextOrdering < daysToAllowOrdering;
 
 	log &&
 		console.log('generateDateInformation', {

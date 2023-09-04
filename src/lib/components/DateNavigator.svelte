@@ -24,28 +24,29 @@
 		</Button>
 	</div>
 	<div class="flex w-52 flex-col items-center gap-1">
-		{#if orderingOpen}
-			<Badge color="green">
-				Ordering Open. {daysToEnd} days left
-			</Badge>
-		{:else}
-			<Badge color="red">Ordering Closed</Badge>
-		{/if}
-		{#if isCurrent}
-			<Badge color="green">Current</Badge>
-		{:else}
-			<div class="flex flex-row items-center justify-center gap-2">
-				<div class="flex">
-					{startDate.toLocaleDateString('en-US', { day: 'numeric' })}
-					{startDate.toLocaleDateString('en-US', { month: 'short' })}
-				</div>
-				<div class="flex">to</div>
-				<div class="flex">
-					{endDate.toLocaleDateString('en-US', { day: 'numeric' })}
-					{endDate.toLocaleDateString('en-US', { month: 'short' })}
-				</div>
+		<div class="flex flex-row justify-center gap-1">
+			{#if orderingOpen}
+				<Badge color="green">
+					Ordering Open. {daysToEnd} days left
+				</Badge>
+			{:else}
+				<Badge color="red">Ordering Closed</Badge>
+			{/if}
+			{#if isCurrent}
+				<Badge color="green">Current</Badge>
+			{/if}
+		</div>
+		<div class="flex flex-row items-center justify-center gap-2">
+			<div class="flex">
+				{startDate.toLocaleDateString('en-US', { day: 'numeric' })}
+				{startDate.toLocaleDateString('en-US', { month: 'short' })}
 			</div>
-		{/if}
+			<div class="flex">to</div>
+			<div class="flex">
+				{endDate.toLocaleDateString('en-US', { day: 'numeric' })}
+				{endDate.toLocaleDateString('en-US', { month: 'short' })}
+			</div>
+		</div>
 	</div>
 
 	<div class="flex w-10 flex-row justify-center">

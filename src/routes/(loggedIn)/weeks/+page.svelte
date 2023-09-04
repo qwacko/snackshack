@@ -3,7 +3,6 @@
 	import { weeksSchema } from '$lib/schema/paramsWeeksSchema.js';
 	import { validatedSearchParamsStore } from '$lib/sveltekitSearchParams.js';
 	import { Button, Alert, Badge, Accordion, AccordionItem } from 'flowbite-svelte';
-	import { addDays } from '$lib/addDays';
 	import { enhance } from '$app/forms';
 	import DisplaySnack from '$lib/components/DisplaySnack.svelte';
 	import DateNavigator from '$lib/components/DateNavigator.svelte';
@@ -13,22 +12,22 @@
 
 	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
 
-	$: thisWeek = data.targetWeekInfo.midPeriod.toISOString().slice(0, 10);
-	$: nextWeek = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
-	$: prevWeek = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
+	$: thisPeriod = new Date().toISOString().slice(0, 10);
+	$: nextPeriod = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
+	$: prevPeriod = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
 </script>
 
 <PageLayout title="Weeks" size="lg">
 	<DateNavigator
 		{...data.targetWeekInfo}
-		prevPeriodURL={$searchParams.updateSearch({ date: prevWeek })}
-		nextPeriodURL={$searchParams.updateSearch({ date: nextWeek })}
-		thisPeriodURL={$searchParams.updateSearch({ date: thisWeek })}
+		prevPeriodURL={$searchParams.updateSearch({ date: prevPeriod })}
+		nextPeriodURL={$searchParams.updateSearch({ date: nextPeriod })}
+		thisPeriodURL={$searchParams.updateSearch({ date: thisPeriod })}
 		orderingOpen={data.targetWeekInfo.canOrder}
 		daysToEnd={data.targetWeekInfo.daysToEndOfOrdering}
 	/>
 	{#if !data.weekData}
-		<div class="flex self-center"><Alert color="red">No Data For Week Yet</Alert></div>
+		<div class="flex self-center"><Alert color="red">No Data For This Period Yet</Alert></div>
 		{#if data.loggedInUser?.admin}
 			{#if data.targetWeekInfo.allowWeekCreation}
 				<div class="flex self-center">

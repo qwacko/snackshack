@@ -14,7 +14,7 @@
 	export let data;
 	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
 
-	$: thisPeriod = data.orderingInfo.dateInformation.midPeriod.toISOString().slice(0, 10);
+	$: thisPeriod = new Date().toISOString().slice(0, 10);
 	$: nextPeriod = data.orderingInfo.dateInformation.nextPeriodMid.toISOString().slice(0, 10);
 	$: prevPeriod = data.orderingInfo.dateInformation.prevPeriodMid.toISOString().slice(0, 10);
 

@@ -30,7 +30,7 @@ const getPeriodUserInfo = async ({ targetDate, userId }: { targetDate: Date; use
 	});
 
 	if (!userInformation?.userOrderConfig?.enabled) {
-		logging.info("No User Order Config or it's not enabled");
+		// logging.info("No User Order Config or it's not enabled");
 		return { dateInformation };
 	}
 
