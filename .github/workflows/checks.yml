@@ -1,8 +1,11 @@
 name: Tests and Checks
 
 on:
+    push:
+    branches: ['master', 'dev']
   pull_request:
-  push:
+    branches: ['master', 'dev']
+    
 jobs:
   test_and_check:
     runs-on: ubuntu-latest
