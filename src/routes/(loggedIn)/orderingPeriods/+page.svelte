@@ -1,9 +1,8 @@
 <script lang="ts">
 	import PageLayout from '$lib/components/PageLayout.svelte';
-	import { weeksSchema } from '$lib/schema/paramsWeeksSchema.js';
+	import { orderingPeriodSchema } from '$lib/schema/paramsOrderingPeriodSchema.js';
 	import { validatedSearchParamsStore } from '$lib/sveltekitSearchParams.js';
 	import { Button, Alert, Badge, Accordion, AccordionItem } from 'flowbite-svelte';
-	import { addDays } from '$lib/addDays';
 	import { enhance } from '$app/forms';
 	import DisplaySnack from '$lib/components/DisplaySnack.svelte';
 	import DateNavigator from '$lib/components/DateNavigator.svelte';
@@ -11,44 +10,48 @@
 
 	export let data;
 
-	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
+	const searchParams = validatedSearchParamsStore(orderingPeriodSchema.passthrough().parse);
 
-	$: thisWeek = addDays(new Date(), 0).toISOString().slice(0, 10);
-	$: nextWeek = addDays(data.targetWeekInfo.endDate, 1).toISOString().slice(0, 10);
-	$: prevWeek = addDays(data.targetWeekInfo.startDate, -1).toISOString().slice(0, 10);
+	$: thisPeriod = new Date().toISOString().slice(0, 10);
+	$: nextPeriod = data.targetOrderingPeriodInfo.nextPeriodMid.toISOString().slice(0, 10);
+	$: prevPeriod = data.targetOrderingPeriodInfo.prevPeriodMid.toISOString().slice(0, 10);
 </script>
 
-<PageLayout title="Weeks" size="lg">
+<PageLayout title={data.orderingTexts.plural} size="lg">
 	<DateNavigator
-		{...data.targetWeekInfo}
-		prevWeekURL={$searchParams.updateSearch({ date: prevWeek })}
-		nextWeekURL={$searchParams.updateSearch({ date: nextWeek })}
-		thisWeekURL={$searchParams.updateSearch({ date: thisWeek })}
-		orderingOpen={data.targetWeekInfo.canOrder}
-		daysToEnd={data.targetWeekInfo.daysToEndOfOrdering}
+		{...data.targetOrderingPeriodInfo}
+		prevPeriodURL={$searchParams.updateSearch({ date: prevPeriod })}
+		nextPeriodURL={$searchParams.updateSearch({ date: nextPeriod })}
+		thisPeriodURL={$searchParams.updateSearch({ date: thisPeriod })}
+		orderingOpen={data.targetOrderingPeriodInfo.canOrder}
+		daysToEnd={data.targetOrderingPeriodInfo.daysToEndOfOrdering}
 	/>
-	{#if !data.weekData}
-		<div class="flex self-center"><Alert color="red">No Data For Week Yet</Alert></div>
+	{#if !data.orderingPeriodData}
+		<div class="flex self-center">
+			<Alert color="red">No Data For This {data.orderingTexts.single} Yet</Alert>
+		</div>
 		{#if data.loggedInUser?.admin}
-			{#if data.targetWeekInfo.allowWeekCreation}
+			{#if data.targetOrderingPeriodInfo.allowOrderingPeriodCreation}
 				<div class="flex self-center">
-					<form action="?/createWeek" method="POST" use:enhance>
+					<form action="?/createPeriod" method="POST" use:enhance>
 						<input type="hidden" name="date" value={$searchParams.value.date} />
-						<Button type="submit" outline>Create Week</Button>
+						<Button type="submit" outline>Create {data.orderingTexts.single}</Button>
 					</form>
 				</div>
 			{/if}
 		{/if}
 	{:else}
 		<div class="flex w-full flex-col items-center gap-4">
-			{#if data.targetWeekInfo.allowWeekCreation}
-				<Button href="/weeks/{data.weekData.id}/recreate" outline>Reset Week</Button>
+			{#if data.targetOrderingPeriodInfo.allowOrderingPeriodCreation}
+				<Button href="/orderingPeriods/{data.orderingPeriodData.id}/recreate" outline
+					>Reset {data.orderingTexts.single}</Button
+				>
 			{/if}
 			<Accordion class="w-full">
 				<AccordionItem>
 					<div slot="header">On Sale</div>
 					<SnackArrangement>
-						{#each data.weekData.options.filter((opt) => opt.special) as currentOption}
+						{#each data.orderingPeriodData.options.filter((opt) => opt.special) as currentOption}
 							<DisplaySnack
 								limit={currentOption.snack.maxQuantity}
 								normalPrice={currentOption.snack.priceCents}
@@ -64,7 +67,7 @@
 				<AccordionItem>
 					<div slot="header">Normal Price</div>
 					<SnackArrangement>
-						{#each data.weekData.options.filter((opt) => !opt.special) as currentOption}
+						{#each data.orderingPeriodData.options.filter((opt) => !opt.special) as currentOption}
 							<DisplaySnack
 								limit={currentOption.snack.maxQuantity}
 								normalPrice={currentOption.snack.priceCents}
@@ -97,7 +100,7 @@
 				</AccordionItem>
 				{#if data.usersWithOrder}
 					{#each data.usersWithOrder as currentUser}
-						{@const userOrderItems = data.weekData.orders.filter(
+						{@const userOrderItems = data.orderingPeriodData.orders.filter(
 							(order) => order.userOrderConfig.user.id === currentUser.id
 						)}
 						{@const userSpend = userOrderItems.reduce(

@@ -58,27 +58,27 @@ export const snack = sqliteTable(
 
 export const snackRelations = relations(snack, ({ one, many }) => ({
 	snackGroup: one(snackGroup, { fields: [snack.snackGroupId], references: [snackGroup.id] }),
-	weekOptions: many(weekOptions)
+	orderingPeriodOptions: many(orderingPeriodOptions)
 }));
 
-export const week = sqliteTable('week', {
+export const orderingPeriod = sqliteTable('week', {
 	id: text('id').primaryKey(),
 	startDate: integer('start_date', { mode: 'timestamp' }).notNull(),
 	endDate: integer('end_date', { mode: 'timestamp' }).notNull()
 });
 
-export const weekRelations = relations(week, ({ many }) => ({
-	options: many(weekOptions),
+export const orderingPeriodRelations = relations(orderingPeriod, ({ many }) => ({
+	options: many(orderingPeriodOptions),
 	orders: many(orderLine)
 }));
 
-export const weekOptions = sqliteTable(
+export const orderingPeriodOptions = sqliteTable(
 	'week_options',
 	{
 		id: text('id').primaryKey(),
-		weekId: text('week_id')
+		orderingPeriodId: text('week_id')
 			.notNull()
-			.references(() => week.id, { onDelete: 'cascade' }),
+			.references(() => orderingPeriod.id, { onDelete: 'cascade' }),
 		snackId: text('snack_id')
 			.notNull()
 			.references(() => snack.id, { onDelete: 'cascade' }),
@@ -86,14 +86,17 @@ export const weekOptions = sqliteTable(
 		special: integer('special', { mode: 'boolean' }).notNull().default(false)
 	},
 	(table) => ({
-		weekIdx: index('option_week_idx').on(table.weekId),
+		orderingPeriodIdx: index('option_week_idx').on(table.orderingPeriodId),
 		snackIdx: index('option_snack_idx').on(table.snackId)
 	})
 );
 
-export const weekOptionsRelations = relations(weekOptions, ({ one, many }) => ({
-	week: one(week, { fields: [weekOptions.weekId], references: [week.id] }),
-	snack: one(snack, { fields: [weekOptions.snackId], references: [snack.id] }),
+export const orderingPeriodOptionsRelations = relations(orderingPeriodOptions, ({ one, many }) => ({
+	orderingPeriod: one(orderingPeriod, {
+		fields: [orderingPeriodOptions.orderingPeriodId],
+		references: [orderingPeriod.id]
+	}),
+	snack: one(snack, { fields: [orderingPeriodOptions.snackId], references: [snack.id] }),
 	orders: many(orderLine)
 }));
 
@@ -104,18 +107,18 @@ export const orderLine = sqliteTable(
 		userOrderConfigId: text('user_order_config_id')
 			.notNull()
 			.references(() => userOrderConfig.id),
-		weekId: text('week_id')
+		orderingPeriodId: text('week_id')
 			.notNull()
-			.references(() => week.id, { onDelete: 'cascade' }),
+			.references(() => orderingPeriod.id, { onDelete: 'cascade' }),
 		snackId: text('snack_id')
 			.notNull()
-			.references(() => weekOptions.id, { onDelete: 'cascade' }),
+			.references(() => orderingPeriodOptions.id, { onDelete: 'cascade' }),
 		quantity: integer('quantity').notNull().default(1),
 		submitted: integer('submitted', { mode: 'boolean' }).notNull().default(false),
 		purchased: integer('purchased', { mode: 'boolean' }).notNull().default(false)
 	},
 	(table) => ({
-		weekIdx: index('order_week_idx').on(table.weekId),
+		orderingPeriodIdx: index('order_week_idx').on(table.orderingPeriodId),
 		snackIdx: index('order_snack_idx').on(table.snackId),
 		userIdx: index('order_user_idx').on(table.userOrderConfigId)
 	})
@@ -126,6 +129,12 @@ export const orderLineRelations = relations(orderLine, ({ one }) => ({
 		fields: [orderLine.userOrderConfigId],
 		references: [userOrderConfig.id]
 	}),
-	week: one(week, { fields: [orderLine.weekId], references: [week.id] }),
-	snack: one(weekOptions, { fields: [orderLine.snackId], references: [weekOptions.id] })
+	orderingPeriod: one(orderingPeriod, {
+		fields: [orderLine.orderingPeriodId],
+		references: [orderingPeriod.id]
+	}),
+	snack: one(orderingPeriodOptions, {
+		fields: [orderLine.snackId],
+		references: [orderingPeriodOptions.id]
+	})
 }));

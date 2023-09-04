@@ -1,9 +1,9 @@
 import { addDays } from '$lib/addDays';
-import { weeksSchema } from '$lib/schema/paramsWeeksSchema';
-import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
+import { orderingPeriodSchema } from '$lib/schema/paramsOrderingPeriodSchema';
+import { generateDateInformation } from '$lib/server/actions/generateDateInformation';
 import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 import { db } from '$lib/server/db/db.js';
-import { orderLine, userOrderConfig, week } from '$lib/server/db/schema/snackSchema.js';
+import { orderLine, userOrderConfig, orderingPeriod } from '$lib/server/db/schema/snackSchema';
 import { user } from '$lib/server/db/schema/userSchema';
 import { logging } from '$lib/server/logging.js';
 import { serverEnv } from '$lib/server/serverEnv';
@@ -12,12 +12,14 @@ import { redirect } from '@sveltejs/kit';
 import { eq, and, lte, gte } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
-const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userId: string }) => {
+const getPeriodUserInfo = async ({ targetDate, userId }: { targetDate: Date; userId: string }) => {
 	const dateInformation = await generateDateInformation({
 		targetDate,
-		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
-		nowDate: new Date(),
-		orderDay: serverEnv.ORDER_DAY
+		frequency: serverEnv.FREQUENCY,
+		startDay: serverEnv.START_DAY,
+		daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
+		orderLead: serverEnv.ORDER_LEAD,
+		nowDate: new Date()
 	});
 
 	const userInformation = await db.query.user.findFirst({
@@ -28,7 +30,7 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 	});
 
 	if (!userInformation?.userOrderConfig?.enabled) {
-		logging.info("No User Order Config or it's not enabled");
+		// logging.info("No User Order Config or it's not enabled");
 		return { dateInformation };
 	}
 
@@ -43,10 +45,10 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 		return { dateInformation };
 	}
 
-	const weekInformation = await db.query.week.findFirst({
+	const periodInformation = await db.query.orderingPeriod.findFirst({
 		where: and(
-			lte(week.startDate, dateInformation.midWeek),
-			gte(week.endDate, dateInformation.midWeek)
+			lte(orderingPeriod.startDate, dateInformation.midPeriod),
+			gte(orderingPeriod.endDate, dateInformation.midPeriod)
 		),
 		with: {
 			options: { with: { snack: { with: { snackGroup: true } } } },
@@ -60,17 +62,17 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 		}
 	});
 
-	if (!weekInformation) {
+	if (!periodInformation) {
 		return { dateInformation };
 	}
 
-	const totalSpent = weekInformation?.orders.reduce((accumulator, currentValue) => {
+	const totalSpent = periodInformation?.orders.reduce((accumulator, currentValue) => {
 		return accumulator + currentValue.snack.priceCents;
 	}, 0);
 
 	const remainingSpend = userSpend - totalSpent;
 
-	const groupInfo = weekInformation.options.reduce<
+	const groupInfo = periodInformation.options.reduce<
 		{ id: string; title: string; limit: number | null; orderCount: number; limitReached: boolean }[]
 	>((accumulator, currentValue) => {
 		const existingIds = accumulator.map((currentGroup) => currentGroup.id);
@@ -78,7 +80,7 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 			return accumulator;
 		}
 
-		const orderCount = weekInformation.orders.filter(
+		const orderCount = periodInformation.orders.filter(
 			(current) => current.snack.snack.snackGroup.id === currentValue.snack.snackGroup.id
 		).length;
 
@@ -89,8 +91,8 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 		return [...accumulator, { ...currentValue.snack.snackGroup, orderCount, limitReached }];
 	}, []);
 
-	const snackInfo = weekInformation.options.map((currentOption) => {
-		const orderCount = weekInformation.orders.filter(
+	const snackInfo = periodInformation.options.map((currentOption) => {
+		const orderCount = periodInformation.orders.filter(
 			(current) => current.snack.snack.id === currentOption.snack.id
 		).length;
 
@@ -134,7 +136,7 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 		userSpend
 	};
 
-	const currentOrderItems = weekInformation.orders
+	const currentOrderItems = periodInformation.orders
 		.map((currentOrder) => {
 			return {
 				id: currentOrder.id,
@@ -154,7 +156,7 @@ const getWeekUserInfo = async ({ targetDate, userId }: { targetDate: Date; userI
 		spendingInfo,
 		snackInfo,
 		groupInfo,
-		weekId: weekInformation.id,
+		periodId: periodInformation.id,
 		currentOrderItems
 	};
 };
@@ -166,21 +168,14 @@ export const load = async ({ locals, route, url }) => {
 		throw redirect(302, '/login');
 	}
 
-	const processedParams = validateSearchParams(url, weeksSchema.passthrough().parse);
+	const processedParams = validateSearchParams(url, orderingPeriodSchema.passthrough().parse);
 
 	const data = processedParams;
 
 	const targetDate = new Date(data.date);
-	const targetWeekInfo = await generateDateInformation({
-		targetDate,
-		firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
-		nowDate: new Date(),
-		orderDay: serverEnv.ORDER_DAY
-	});
 
 	return {
-		orderingInfo: getWeekUserInfo({ targetDate, userId: locals.user.userId }),
-		targetWeekInfo
+		orderingInfo: getPeriodUserInfo({ targetDate, userId: locals.user.userId })
 	};
 };
 
@@ -188,11 +183,11 @@ export const actions = {
 	addSnack: async ({ request, locals }) => {
 		const form = await request.formData();
 		const snackId = form.get('snackId')?.toString();
-		const weekId = form.get('weekId')?.toString();
+		const periodId = form.get('orderingPeriodId')?.toString();
 		const userId = form.get('userId')?.toString();
 
-		if (!snackId || !weekId || !userId) {
-			logging.info('Missing Form Information', { snackId, weekId, userId });
+		if (!snackId || !periodId || !userId) {
+			logging.info('Missing Form Information', { snackId, periodId, userId });
 			return;
 		}
 
@@ -203,17 +198,17 @@ export const actions = {
 			return;
 		}
 
-		const weekData = await db.query.week.findFirst({
-			where: eq(week.id, weekId)
+		const periodData = await db.query.orderingPeriod.findFirst({
+			where: eq(orderingPeriod.id, periodId)
 		});
 
-		if (!weekData) {
-			logging.info('No Week Data', { weekId });
+		if (!periodData) {
+			logging.info('No Period Data', { periodId });
 			return;
 		}
 
-		const confirmationInfo = await getWeekUserInfo({
-			targetDate: addDays(weekData.startDate, 2),
+		const confirmationInfo = await getPeriodUserInfo({
+			targetDate: addDays(periodData.startDate, 2),
 			userId
 		});
 
@@ -237,7 +232,7 @@ export const actions = {
 		}
 
 		if (!snackInfo.canAdd) {
-			logging.info('Cannot Add To Chosen Week');
+			logging.info('Cannot Add To Chosen Period');
 			return;
 		}
 
@@ -252,7 +247,7 @@ export const actions = {
 
 		await db.insert(orderLine).values({
 			id: nanoid(),
-			weekId,
+			orderingPeriodId: periodId,
 			snackId,
 			userOrderConfigId: userOrderConfigFound.id,
 			quantity: 1
@@ -277,7 +272,7 @@ export const actions = {
 
 		const orderLineFound = await db.query.orderLine.findFirst({
 			where: eq(orderLine.id, id),
-			with: { userOrderConfig: true, week: true }
+			with: { userOrderConfig: true, orderingPeriod: true }
 		});
 
 		if (!orderLineFound) {
@@ -285,8 +280,8 @@ export const actions = {
 			return;
 		}
 
-		if (!orderLineFound.week) {
-			logging.info('No Week Found');
+		if (!orderLineFound.orderingPeriod) {
+			logging.info('No Ordering Period Found');
 			return;
 		}
 
@@ -296,14 +291,16 @@ export const actions = {
 		}
 
 		const dateInformation = await generateDateInformation({
-			targetDate: addDays(orderLineFound.week.startDate, 3),
-			firstDayOfWeek: serverEnv.FIRST_DAY_OF_WEEK,
-			nowDate: new Date(),
-			orderDay: serverEnv.ORDER_DAY
+			targetDate: addDays(orderLineFound.orderingPeriod.startDate, 3),
+			daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
+			frequency: serverEnv.FREQUENCY,
+			orderLead: serverEnv.ORDER_LEAD,
+			startDay: serverEnv.START_DAY,
+			nowDate: new Date()
 		});
 
 		if (!dateInformation.canOrder) {
-			logging.info('Ordering Closed For The Week');
+			logging.info('Ordering Closed For The Ordering Period');
 			return;
 		}
 
