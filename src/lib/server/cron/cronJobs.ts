@@ -4,8 +4,8 @@ import { backupDB, db } from '../db/db';
 import { logging } from '../logging';
 import { serverEnv } from '../serverEnv';
 import type { CronJob } from './cron';
-import { week } from '../db/schema';
-import { createPeriod } from '../actions/createWeek';
+import { orderingPeriod } from '../db/schema';
+import { createPeriod } from '../actions/createOrderingPeriod';
 
 export const cronJobs: CronJob[] = [
 	{
@@ -16,24 +16,33 @@ export const cronJobs: CronJob[] = [
 		}
 	},
 	{
-		name: 'Generate Week',
+		name: 'Generate Ordering Period',
 		schedule: '* * * * *',
 		job: async () => {
 			const nowDate = new Date();
-			const prevWeek = addDays(nowDate, -7);
-			const nextWeek = addDays(nowDate, 7);
+			const prevPeriod = addDays(nowDate, serverEnv.FREQUENCY === 'MONTHLY' ? -30 : -7);
+			const nextPeriod = addDays(nowDate, serverEnv.FREQUENCY === 'MONTHLY' ? 30 : 7);
 
-			const weekCountStart = await db.select({ count: sql<number>`count(*)` }).from(week);
+			const orderingPeriodCountStart = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(orderingPeriod);
 
-			await Promise.all([createPeriod(nowDate), createPeriod(prevWeek), createPeriod(nextWeek)]);
+			await Promise.all([
+				createPeriod(nowDate),
+				createPeriod(prevPeriod),
+				createPeriod(nextPeriod)
+			]);
 
-			const weekCountEnd = await db.select({ count: sql<number>`count(*)` }).from(week);
+			const orderingPeriodCountEnd = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(orderingPeriod);
 
-			const weekAddedCount = weekCountEnd[0]['count'] - weekCountStart[0]['count'];
-			if (weekAddedCount > 0) {
+			const orderingPeriodAddedCount =
+				orderingPeriodCountEnd[0]['count'] - orderingPeriodCountStart[0]['count'];
+			if (orderingPeriodAddedCount > 0) {
 				logging.info(
-					'CRON : Number Of Weeks Added: ',
-					weekCountEnd[0]['count'] - weekCountStart[0]['count']
+					'CRON : Number Of Ordering Periods Added: ',
+					orderingPeriodCountEnd[0]['count'] - orderingPeriodCountStart[0]['count']
 				);
 			}
 		}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PageLayout from '$lib/components/PageLayout.svelte';
-	import { weeksSchema } from '$lib/schema/paramsWeeksSchema.js';
+	import { orderingPeriodSchema } from '$lib/schema/paramsOrderingPeriodSchema.js';
 	import { validatedSearchParamsStore } from '$lib/sveltekitSearchParams.js';
 	import { Button, Alert, Badge, Accordion, AccordionItem } from 'flowbite-svelte';
 	import { enhance } from '$app/forms';
@@ -10,28 +10,28 @@
 
 	export let data;
 
-	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
+	const searchParams = validatedSearchParamsStore(orderingPeriodSchema.passthrough().parse);
 
 	$: thisPeriod = new Date().toISOString().slice(0, 10);
-	$: nextPeriod = data.targetWeekInfo.nextPeriodMid.toISOString().slice(0, 10);
-	$: prevPeriod = data.targetWeekInfo.prevPeriodMid.toISOString().slice(0, 10);
+	$: nextPeriod = data.targetOrderingPeriodInfo.nextPeriodMid.toISOString().slice(0, 10);
+	$: prevPeriod = data.targetOrderingPeriodInfo.prevPeriodMid.toISOString().slice(0, 10);
 </script>
 
 <PageLayout title={data.orderingTexts.plural} size="lg">
 	<DateNavigator
-		{...data.targetWeekInfo}
+		{...data.targetOrderingPeriodInfo}
 		prevPeriodURL={$searchParams.updateSearch({ date: prevPeriod })}
 		nextPeriodURL={$searchParams.updateSearch({ date: nextPeriod })}
 		thisPeriodURL={$searchParams.updateSearch({ date: thisPeriod })}
-		orderingOpen={data.targetWeekInfo.canOrder}
-		daysToEnd={data.targetWeekInfo.daysToEndOfOrdering}
+		orderingOpen={data.targetOrderingPeriodInfo.canOrder}
+		daysToEnd={data.targetOrderingPeriodInfo.daysToEndOfOrdering}
 	/>
-	{#if !data.weekData}
+	{#if !data.orderingPeriodData}
 		<div class="flex self-center">
-			<Alert color="red">No Data For This {data.orderingTexts.singleLower} Yet</Alert>
+			<Alert color="red">No Data For This {data.orderingTexts.single} Yet</Alert>
 		</div>
 		{#if data.loggedInUser?.admin}
-			{#if data.targetWeekInfo.allowWeekCreation}
+			{#if data.targetOrderingPeriodInfo.allowOrderingPeriodCreation}
 				<div class="flex self-center">
 					<form action="?/createPeriod" method="POST" use:enhance>
 						<input type="hidden" name="date" value={$searchParams.value.date} />
@@ -42,8 +42,8 @@
 		{/if}
 	{:else}
 		<div class="flex w-full flex-col items-center gap-4">
-			{#if data.targetWeekInfo.allowWeekCreation}
-				<Button href="/weeks/{data.weekData.id}/recreate" outline
+			{#if data.targetOrderingPeriodInfo.allowOrderingPeriodCreation}
+				<Button href="/orderingPeriods/{data.orderingPeriodData.id}/recreate" outline
 					>Reset {data.orderingTexts.single}</Button
 				>
 			{/if}
@@ -51,7 +51,7 @@
 				<AccordionItem>
 					<div slot="header">On Sale</div>
 					<SnackArrangement>
-						{#each data.weekData.options.filter((opt) => opt.special) as currentOption}
+						{#each data.orderingPeriodData.options.filter((opt) => opt.special) as currentOption}
 							<DisplaySnack
 								limit={currentOption.snack.maxQuantity}
 								normalPrice={currentOption.snack.priceCents}
@@ -67,7 +67,7 @@
 				<AccordionItem>
 					<div slot="header">Normal Price</div>
 					<SnackArrangement>
-						{#each data.weekData.options.filter((opt) => !opt.special) as currentOption}
+						{#each data.orderingPeriodData.options.filter((opt) => !opt.special) as currentOption}
 							<DisplaySnack
 								limit={currentOption.snack.maxQuantity}
 								normalPrice={currentOption.snack.priceCents}
@@ -100,7 +100,7 @@
 				</AccordionItem>
 				{#if data.usersWithOrder}
 					{#each data.usersWithOrder as currentUser}
-						{@const userOrderItems = data.weekData.orders.filter(
+						{@const userOrderItems = data.orderingPeriodData.orders.filter(
 							(order) => order.userOrderConfig.user.id === currentUser.id
 						)}
 						{@const userSpend = userOrderItems.reduce(

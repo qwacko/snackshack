@@ -40,7 +40,7 @@ export const generateDateInformation = async ({
 	const nextPeriodMid = addDays(midPeriod, frequency === 'MONTHLY' ? 30 : 7);
 	const prevPeriodMid = addDays(midPeriod, frequency === 'MONTHLY' ? -30 : -7);
 
-	const allowWeekCreation = canOrder;
+	const allowOrderingPeriodCreation = canOrder;
 
 	const daysToEndOfNextOrdering = differenceBetweenDates(nowDate, addDays(endDate, -orderLead));
 	const showNextPeriod = daysToEndOfNextOrdering < daysToAllowOrdering;
@@ -62,7 +62,7 @@ export const generateDateInformation = async ({
 		canOrder,
 		midPeriod,
 		daysToEndOfOrdering,
-		allowWeekCreation,
+		allowOrderingPeriodCreation,
 		nextPeriodMid,
 		prevPeriodMid,
 		showNextPeriod

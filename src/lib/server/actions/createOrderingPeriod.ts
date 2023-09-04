@@ -1,16 +1,17 @@
 import { db } from '$lib/server/db/db';
 import { and, gte, lte, eq, gt } from 'drizzle-orm';
 import { generateDateInformation } from './generateDateInformation';
-import { snack, week, weekOptions } from '$lib/server/db/schema';
+import { snack, orderingPeriod, orderingPeriodOptions } from '$lib/server/db/schema';
 import { nanoid } from 'nanoid';
 import { logging } from '$lib/server/logging';
 import { serverEnv } from '../serverEnv';
+import { orderingPeriodText } from '../generateOrderingPeriodText';
 
 export const populatePeriod = async ({
-	weekId,
+	orderingPeriodId,
 	transDB
 }: {
-	weekId: string;
+	orderingPeriodId: string;
 	transDB: typeof db;
 }) => {
 	const snacks = await transDB.query.snack.findMany({
@@ -18,7 +19,7 @@ export const populatePeriod = async ({
 		with: { snackGroup: true }
 	});
 
-	const weekOptionsToCreate = snacks.map((currentSnack) => {
+	const orderinPeriodOptionsToCreate = snacks.map((currentSnack) => {
 		const enable =
 			currentSnack.availablePercentage > 0
 				? Math.random() * 100 < currentSnack.availablePercentage
@@ -34,7 +35,7 @@ export const populatePeriod = async ({
 		return {
 			id: nanoid(),
 			enable,
-			weekId,
+			orderingPeriodId,
 			special: onSale,
 			priceCents,
 			snackId: currentSnack.id
@@ -42,14 +43,14 @@ export const populatePeriod = async ({
 	});
 
 	await Promise.all(
-		weekOptionsToCreate.map(async (currentOption) => {
+		orderinPeriodOptionsToCreate.map(async (currentOption) => {
 			const { enable, ...optionData } = currentOption;
 
 			if (!enable) {
 				return;
 			}
 
-			await db.insert(weekOptions).values(optionData).execute();
+			await db.insert(orderingPeriodOptions).values(optionData).execute();
 		})
 	);
 };
@@ -64,15 +65,19 @@ export const createPeriod = async (date: Date, logErrors: boolean = false) => {
 		nowDate: new Date()
 	});
 
-	if (!dateInformation.allowWeekCreation) {
-		logErrors && logging.error('createWeek', 'Week creation not allowed (outside of range)');
+	if (!dateInformation.allowOrderingPeriodCreation) {
+		logErrors &&
+			logging.error(
+				'createOrderingPeriod',
+				`${orderingPeriodText.single} creation not allowed (outside of range)`
+			);
 		return;
 	}
 
-	const searchPeriod = await db.query.week.findFirst({
+	const searchPeriod = await db.query.orderingPeriod.findFirst({
 		where: and(
-			lte(week.startDate, dateInformation.midPeriod),
-			gte(week.endDate, dateInformation.midPeriod)
+			lte(orderingPeriod.startDate, dateInformation.midPeriod),
+			gte(orderingPeriod.endDate, dateInformation.midPeriod)
 		)
 	});
 
@@ -83,7 +88,7 @@ export const createPeriod = async (date: Date, logErrors: boolean = false) => {
 
 	db.transaction(async (dbTrans) => {
 		await dbTrans
-			.insert(week)
+			.insert(orderingPeriod)
 			.values({
 				id: nanoid(),
 				startDate: dateInformation.startDate,
@@ -91,20 +96,20 @@ export const createPeriod = async (date: Date, logErrors: boolean = false) => {
 			})
 			.execute();
 
-		const createdWeek = await dbTrans.query.week.findFirst({
+		const createdOrderingPeriod = await dbTrans.query.orderingPeriod.findFirst({
 			where: and(
-				lte(week.startDate, dateInformation.midPeriod),
-				gte(week.endDate, dateInformation.midPeriod)
+				lte(orderingPeriod.startDate, dateInformation.midPeriod),
+				gte(orderingPeriod.endDate, dateInformation.midPeriod)
 			)
 		});
 
-		if (!createdWeek) {
+		if (!createdOrderingPeriod) {
 			dbTrans.rollback();
 			return;
 		}
 
-		await populatePeriod({ weekId: createdWeek.id, transDB: dbTrans });
+		await populatePeriod({ orderingPeriodId: createdOrderingPeriod.id, transDB: dbTrans });
 
-		logging.info('New Period Created', createdWeek);
+		logging.info('New Period Created', createdOrderingPeriod);
 	});
 };

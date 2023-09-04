@@ -1,23 +1,23 @@
-import { weeksSchema } from '$lib/schema/paramsWeeksSchema';
+import { orderingPeriodSchema } from '$lib/schema/paramsOrderingPeriodSchema';
 import { db } from '$lib/server/db/db.js';
 import { validateSearchParams } from '$lib/sveltekitSearchParams';
 import { and, gte, lte, notInArray } from 'drizzle-orm';
-import { snack, week } from '$lib/server/db/schema/snackSchema.js';
+import { snack, orderingPeriod } from '$lib/server/db/schema/snackSchema';
 import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
-import { createPeriod } from '$lib/server/actions/createWeek.js';
+import { createPeriod } from '$lib/server/actions/createOrderingPeriod';
 import { logging } from '$lib/server/logging.js';
 import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
-import { serverEnv, type SERVER_ENV_TYPE } from '$lib/server/serverEnv.js';
+import { serverEnv } from '$lib/server/serverEnv.js';
 
 export const load = async ({ locals, route, url }) => {
 	useCombinedAuthGuard({ locals, route });
 
-	const processedParams = validateSearchParams(url, weeksSchema.passthrough().parse);
+	const processedParams = validateSearchParams(url, orderingPeriodSchema.passthrough().parse);
 
 	const data = processedParams;
 
 	const targetDate = new Date(data.date);
-	const targetWeekInfo = await generateDateInformation({
+	const targetOrderingPeriodInfo = await generateDateInformation({
 		targetDate: targetDate,
 		frequency: serverEnv.FREQUENCY,
 		daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
@@ -27,10 +27,10 @@ export const load = async ({ locals, route, url }) => {
 		log: false
 	});
 
-	const weekData = await db.query.week.findFirst({
+	const orderingPeriodData = await db.query.orderingPeriod.findFirst({
 		where: and(
-			lte(week.startDate, targetWeekInfo.midPeriod),
-			gte(week.endDate, targetWeekInfo.midPeriod)
+			lte(orderingPeriod.startDate, targetOrderingPeriodInfo.midPeriod),
+			gte(orderingPeriod.endDate, targetOrderingPeriodInfo.midPeriod)
 		),
 		with: {
 			options: { with: { snack: true } },
@@ -40,8 +40,8 @@ export const load = async ({ locals, route, url }) => {
 		}
 	});
 
-	const usersWithOrder = weekData
-		? weekData.orders
+	const usersWithOrder = orderingPeriodData
+		? orderingPeriodData.orders
 				.map((currentOrder) => currentOrder.userOrderConfig.user.id)
 				.filter((user) => user)
 				.reduce((accumulator, currentValue) => {
@@ -53,13 +53,15 @@ export const load = async ({ locals, route, url }) => {
 				}, [] as string[])
 				.map((userId) => ({
 					id: userId,
-					name: weekData?.orders.find(
+					name: orderingPeriodData?.orders.find(
 						(currentOrder) => currentOrder.userOrderConfig.userId === userId
 					)?.userOrderConfig.user.name
 				}))
 		: undefined;
 
-	const includedSnackIds = weekData?.options.map((currentOption) => currentOption.snackId);
+	const includedSnackIds = orderingPeriodData?.options.map(
+		(currentOption) => currentOption.snackId
+	);
 
 	const excludedSnacks =
 		includedSnackIds && includedSnackIds.length > 0
@@ -71,8 +73,8 @@ export const load = async ({ locals, route, url }) => {
 	return {
 		searchData: data,
 		targetDate,
-		targetWeekInfo,
-		weekData,
+		targetOrderingPeriodInfo,
+		orderingPeriodData,
 		excludedSnacks,
 		usersWithOrder
 	};

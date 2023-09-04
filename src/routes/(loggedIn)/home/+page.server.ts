@@ -1,9 +1,9 @@
 import { addDays } from '$lib/addDays';
-import { weeksSchema } from '$lib/schema/paramsWeeksSchema';
-import { generateDateInformation } from '$lib/server/actions/generateDateInformation.js';
+import { orderingPeriodSchema } from '$lib/schema/paramsOrderingPeriodSchema';
+import { generateDateInformation } from '$lib/server/actions/generateDateInformation';
 import { useCombinedAuthGuard } from '$lib/server/authGuard.js';
 import { db } from '$lib/server/db/db.js';
-import { orderLine, userOrderConfig, week } from '$lib/server/db/schema/snackSchema.js';
+import { orderLine, userOrderConfig, orderingPeriod } from '$lib/server/db/schema/snackSchema';
 import { user } from '$lib/server/db/schema/userSchema';
 import { logging } from '$lib/server/logging.js';
 import { serverEnv } from '$lib/server/serverEnv';
@@ -45,10 +45,10 @@ const getPeriodUserInfo = async ({ targetDate, userId }: { targetDate: Date; use
 		return { dateInformation };
 	}
 
-	const periodInformation = await db.query.week.findFirst({
+	const periodInformation = await db.query.orderingPeriod.findFirst({
 		where: and(
-			lte(week.startDate, dateInformation.midPeriod),
-			gte(week.endDate, dateInformation.midPeriod)
+			lte(orderingPeriod.startDate, dateInformation.midPeriod),
+			gte(orderingPeriod.endDate, dateInformation.midPeriod)
 		),
 		with: {
 			options: { with: { snack: { with: { snackGroup: true } } } },
@@ -168,7 +168,7 @@ export const load = async ({ locals, route, url }) => {
 		throw redirect(302, '/login');
 	}
 
-	const processedParams = validateSearchParams(url, weeksSchema.passthrough().parse);
+	const processedParams = validateSearchParams(url, orderingPeriodSchema.passthrough().parse);
 
 	const data = processedParams;
 
@@ -183,7 +183,7 @@ export const actions = {
 	addSnack: async ({ request, locals }) => {
 		const form = await request.formData();
 		const snackId = form.get('snackId')?.toString();
-		const periodId = form.get('weekId')?.toString();
+		const periodId = form.get('orderingPeriodId')?.toString();
 		const userId = form.get('userId')?.toString();
 
 		if (!snackId || !periodId || !userId) {
@@ -198,8 +198,8 @@ export const actions = {
 			return;
 		}
 
-		const periodData = await db.query.week.findFirst({
-			where: eq(week.id, periodId)
+		const periodData = await db.query.orderingPeriod.findFirst({
+			where: eq(orderingPeriod.id, periodId)
 		});
 
 		if (!periodData) {
@@ -247,7 +247,7 @@ export const actions = {
 
 		await db.insert(orderLine).values({
 			id: nanoid(),
-			weekId: periodId,
+			orderingPeriodId: periodId,
 			snackId,
 			userOrderConfigId: userOrderConfigFound.id,
 			quantity: 1
@@ -272,7 +272,7 @@ export const actions = {
 
 		const orderLineFound = await db.query.orderLine.findFirst({
 			where: eq(orderLine.id, id),
-			with: { userOrderConfig: true, week: true }
+			with: { userOrderConfig: true, orderingPeriod: true }
 		});
 
 		if (!orderLineFound) {
@@ -280,8 +280,8 @@ export const actions = {
 			return;
 		}
 
-		if (!orderLineFound.week) {
-			logging.info('No Week Found');
+		if (!orderLineFound.orderingPeriod) {
+			logging.info('No Ordering Period Found');
 			return;
 		}
 
@@ -291,7 +291,7 @@ export const actions = {
 		}
 
 		const dateInformation = await generateDateInformation({
-			targetDate: addDays(orderLineFound.week.startDate, 3),
+			targetDate: addDays(orderLineFound.orderingPeriod.startDate, 3),
 			daysToAllowOrdering: serverEnv.DAYS_TO_ALLOW_ORDERING,
 			frequency: serverEnv.FREQUENCY,
 			orderLead: serverEnv.ORDER_LEAD,
@@ -300,7 +300,7 @@ export const actions = {
 		});
 
 		if (!dateInformation.canOrder) {
-			logging.info('Ordering Closed For The Week');
+			logging.info('Ordering Closed For The Ordering Period');
 			return;
 		}
 

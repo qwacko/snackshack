@@ -5,14 +5,14 @@
 	import { addDays } from '$lib/addDays';
 	import DateNavigator from '$lib/components/DateNavigator.svelte';
 
-	import { weeksSchema } from '$lib/schema/paramsWeeksSchema.js';
+	import { orderingPeriodSchema } from '$lib/schema/paramsOrderingPeriodSchema.js';
 	import { validatedSearchParamsStore } from '$lib/sveltekitSearchParams.js';
 
 	import { Accordion, AccordionItem, Badge, Progressbar } from 'flowbite-svelte';
 	import SnackArrangement from '$lib/components/SnackArrangement.svelte';
 
 	export let data;
-	const searchParams = validatedSearchParamsStore(weeksSchema.passthrough().parse);
+	const searchParams = validatedSearchParamsStore(orderingPeriodSchema.passthrough().parse);
 
 	$: thisPeriod = new Date().toISOString().slice(0, 10);
 	$: nextPeriod = data.orderingInfo.dateInformation.nextPeriodMid.toISOString().slice(0, 10);
@@ -103,7 +103,7 @@
 							{#each groupOptions as currentOption}
 								<form action="?/addSnack" method="POST" class="flex" use:enhance>
 									<input type="hidden" name="snackId" value={currentOption.id} />
-									<input type="hidden" name="weekId" value={data.orderingInfo.periodId} />
+									<input type="hidden" name="orderingPeriodId" value={data.orderingInfo.periodId} />
 									<input type="hidden" name="userId" value={data.loggedInUser?.userId} />
 									<button type="submit" disabled={currentOption.disabled || !canOrder}>
 										<DisplaySnack {...currentOption} class="h-full" />

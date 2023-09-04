@@ -7,7 +7,7 @@
 	import SnacksIcon from '$lib/components/icons/SnacksIcon.svelte';
 	import UserIcon from '$lib/components/icons/UserIcon.svelte';
 	import UsersIcon from '$lib/components/icons/UsersIcon.svelte';
-	import WeeksIcon from '$lib/components/icons/WeeksIcon.svelte';
+	import CalendarIcon from '$lib/components/icons/CalendarIcon.svelte';
 	import { Button, Tooltip } from 'flowbite-svelte';
 
 	export let data;
@@ -44,14 +44,14 @@
 					<Tooltip triggeredBy="[id=usersLink]" type="light">Users</Tooltip>
 				</Button>
 				<Button
-					id="weeksLink"
+					id="orderingPeriodsLink"
 					href="/orderingPeriods"
 					color={periodsPage ? 'primary' : 'none'}
 					class="p-3"
 				>
-					<WeeksIcon />
-					<Tooltip triggeredBy="[id=weeksLink]" type="light"
-						>{data.orderingTexts.periodsTitle}</Tooltip
+					<CalendarIcon />
+					<Tooltip triggeredBy="[id=orderingPeriodsLink]" type="light"
+						>{data.orderingTexts.plural}</Tooltip
 					>
 				</Button>
 
